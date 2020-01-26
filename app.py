@@ -362,7 +362,7 @@ def handle_message(event):
                     text2 = '\n' + text_request +'\n' + 'O ' + OpenM + ' ({} %)'.format(barM) +'\n' + 'B ' + stopM + ' ~ '+ buyM +'\n' + 'X ' + exitM1 + ' | ' + exitM2 
                     text3 = 'รอซื้อ' + '\n' + text_request +'\n' + 'B ' + stopY + ' ~ '+ buyY 
                     text4 = 'อย่าเพิ่งเข้า' + '\n'  + text_request +'\n' + 'O ' + OpenM + ' ({} %)'.format(barM) +'\n' + 'B ' + stopM + ' ~ '+ buyM 
-                    text5 = '\n' + text_request + '\n' + 'ซื้อขายน้อย' + '\n' + 'Val : ' + request_val + '\n' + 'Vol : ' + Volume
+                    text5 = 'ซื้อขายน้อย' + '\n' + text_request + '\n' + 'Val : ' + request_val + '\n' + 'Vol : ' + Volume
                     alert = 'ชนแนวต้าน'
 
                     if float(value) > 7500000:
