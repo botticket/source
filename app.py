@@ -60,7 +60,7 @@ def handle_message(event):
             from bs4 import BeautifulSoup as soup 
 
             def usdcheck():
-                IQXUSTHB = '29.74'
+                IQXUSTHB = '31.21'
                 req = Request('https://th.investing.com/currencies/usd-thb', headers={'User-Agent': 'Chrome/78.0'})
                 webopen = urlopen(req).read()
 
@@ -114,7 +114,7 @@ def handle_message(event):
             from bs4 import BeautifulSoup as soup 
 
             def wticheck():
-                IQXWTI = '61.35'
+                IQXWTI = '51.55'
                 req = Request('https://th.investing.com/commodities/crude-oil', headers={'User-Agent': 'Chrome/78.0'})
                 webopen = urlopen(req).read()
 
@@ -161,7 +161,7 @@ def handle_message(event):
             from urllib.request import Request, urlopen
             from bs4 import BeautifulSoup as soup 
             def goldcheck():
-                IQXGL = '1517.2'
+                IQXGL = '1589.69'
 
                 req = Request('https://th.investing.com/currencies/xau-usd', headers={'User-Agent': 'Chrome/78.0'})
                 webopen = urlopen(req).read()
@@ -267,8 +267,8 @@ def handle_message(event):
                     list = self.stock
 
                     dfY = data.DataReader(f'{list}', data_source="yahoo", start='2020-01-01', end=end)
-                    dfM = data.DataReader(f'{list}', data_source="yahoo", start='2020-01-01', end=end)
-                    dfW = data.DataReader(f'{list}', data_source="yahoo", start='2020-01-24', end=end)
+                    dfM = data.DataReader(f'{list}', data_source="yahoo", start='2020-02-01', end=end)
+                    dfW = data.DataReader(f'{list}', data_source="yahoo", start='2020-02-01', end=end)
 
                     #2020-01-01 = Y M D
 
