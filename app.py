@@ -360,8 +360,8 @@ def handle_message(event):
                     stopY = '%.2f'%stopY
                     stopY = str(stopY) 
 
-                    text1 = '\n' + text_request +'\n' + 'O: ' + OpenM + ' ({} %)'.format(barM) +'\n' + 'B: ' + stopM + ' ~ '+ buyM +'\n' + 'X: ' + exitM1 + ' | ' + exitM2 
-                    text2 = '\n' + text_request +'\n' + 'O ' + OpenM + ' ({} %)'.format(barM) +'\n' + 'B ' + stopM + ' ~ '+ buyM +'\n' + 'X ' + exitM1 + ' | ' + exitM2 
+                    text1 = text_request +'\n' + 'O: ' + OpenM + ' ({} %)'.format(barM) +'\n' + 'B: ' + stopM + ' ~ '+ buyM +'\n' + 'X: ' + exitM1 + ' | ' + exitM2 
+                    text2 = text_request +'\n' + 'O ' + OpenM + ' ({} %)'.format(barM) +'\n' + 'B ' + stopM + ' ~ '+ buyM +'\n' + 'X ' + exitM1 + ' | ' + exitM2 
                     text3 = 'รอซื้อ' + '\n' + text_request +'\n' + 'B ' + stopM + ' ~ '+ buyM
                     text4 = 'อย่าเพิ่งเข้า' + '\n'  + text_request +'\n' + 'O ' + OpenY + ' ({} %)'.format(barY) +'\n' + 'B ' + stopY + ' ~ '+ buyY 
                     text5 = 'ซื้อขายน้อย' + '\n' + text_request + '\n' + 'Val : ' + request_val + '\n' + 'Vol : ' + Volume
