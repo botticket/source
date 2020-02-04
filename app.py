@@ -306,7 +306,9 @@ def handle_message(event):
                     barW = '%.2f'%barW
                     barW = float(barW)
 
-                    Volume = dfM['Volume'].iloc[-2]
+                    Volume1 = dfM['Volume'].iloc[-1]
+                    Volume2 = dfM['Volume'].iloc[-2]
+                    Volume = (float(Volume1)+float(Volume2))/2
                     Volume  = '%.0f'%Volume
                     Volume = str(Volume)
 
@@ -358,10 +360,10 @@ def handle_message(event):
                     stopY = '%.2f'%stopY
                     stopY = str(stopY) 
 
-                    text1 = '\n' + text_request +'\n' + 'O ' + OpenM + ' ({} %)'.format(barM) +'\n' + 'B ' + stopM + ' ~ '+ buyM +'\n' + 'X ' + exitM1 + ' | ' + exitM2 
+                    text1 = '\n' + text_request +'\n' + 'O: ' + OpenM + ' ({} %)'.format(barM) +'\n' + 'B: ' + stopM + ' ~ '+ buyM +'\n' + 'X: ' + exitM1 + ' | ' + exitM2 
                     text2 = '\n' + text_request +'\n' + 'O ' + OpenM + ' ({} %)'.format(barM) +'\n' + 'B ' + stopM + ' ~ '+ buyM +'\n' + 'X ' + exitM1 + ' | ' + exitM2 
-                    text3 = 'รอซื้อ' + '\n' + text_request +'\n' + 'B ' + stopY + ' ~ '+ buyY 
-                    text4 = 'อย่าเพิ่งเข้า' + '\n'  + text_request +'\n' + 'O ' + OpenM + ' ({} %)'.format(barM) +'\n' + 'B ' + stopM + ' ~ '+ buyM 
+                    text3 = 'รอซื้อ' + '\n' + text_request +'\n' + 'B ' + stopM + ' ~ '+ buyM
+                    text4 = 'อย่าเพิ่งเข้า' + '\n'  + text_request +'\n' + 'O ' + OpenY + ' ({} %)'.format(barY) +'\n' + 'B ' + stopY + ' ~ '+ buyY 
                     text5 = 'ซื้อขายน้อย' + '\n' + text_request + '\n' + 'Val : ' + request_val + '\n' + 'Vol : ' + Volume
                     alert = 'ชนแนวต้าน'
 
@@ -381,7 +383,7 @@ def handle_message(event):
                                 word_to_reply2 = str(alert + text2)
                             elif 3.00 > barM >= 0.00:
                                 if barW >= 0:
-                                    word_to_reply2 = str(text1)
+                                    word_to_reply2 = str(text2)
                                 else:
                                     word_to_reply2 = str(text3)
                             else:
