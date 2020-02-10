@@ -366,24 +366,36 @@ def handle_message(event):
                     text4 = 'อย่าเพิ่งเข้า' + '\n'  + text_request +'\n' + 'O ' + OpenY + ' ({} %)'.format(barY) +'\n' + 'B ' + stopY + ' ~ '+ buyY 
                     text5 = 'ซื้อขายน้อย' + '\n' + text_request + '\n' + 'Val : ' + request_val + '\n' + 'Vol : ' + Volume
                     alert = 'ชนแนวต้าน'
+                    alert2 = 'ไปต่อ'
+                    notice = 'ซื้อ'
 
                     if float(value) > 7500000:
                         if barY >= 0:
                             if barM > 6.00:
                                 word_to_reply2 = str(alert + text1)
-                            elif 3.00 > barM >= 0.00:
+                            elif barM >= 3.00:
                                 if barW >= 0:
-                                    word_to_reply2 = str(text1)
+                                    word_to_reply2 = str(alert2 + text1)
+                                else:
+                                    word_to_reply2 = str(text3)
+                            elif barM >= 0.00:
+                                if barW >= 0:
+                                    word_to_reply2 = str(notice + text1)
                                 else:
                                     word_to_reply2 = str(text3)
                             else:
                                 word_to_reply2 = str(text3)
                         elif barM >= 0:
-                            if barM > 6.00:
+                            if barM > 6.00:                             
                                 word_to_reply2 = str(alert + text2)
-                            elif 3.00 > barM >= 0.00:
+                            elif barM >= 3.00:
                                 if barW >= 0:
-                                    word_to_reply2 = str(text2)
+                                    word_to_reply2 = str(alert2 + text2)
+                                else:
+                                    word_to_reply2 = str(text3)
+                            elif barM >= 0.00:
+                                if barW >= 0:
+                                    word_to_reply2 = str(notice + text2)
                                 else:
                                     word_to_reply2 = str(text3)
                             else:
