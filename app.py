@@ -268,7 +268,7 @@ def handle_message(event):
 
                     dfY = data.DataReader(f'{list}', data_source="yahoo", start='2020-01-01', end=end)
                     dfM = data.DataReader(f'{list}', data_source="yahoo", start='2020-02-01', end=end)
-                    dfW = data.DataReader(f'{list}', data_source="yahoo", start='2020-02-01', end=end)
+                    dfW = data.DataReader(f'{list}', data_source="yahoo", start='2020-02-14', end=end)
 
                     #2020-01-01 = Y M D
 
