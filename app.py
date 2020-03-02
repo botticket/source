@@ -59,11 +59,9 @@ def handle_message(event):
             from urllib.request import Request, urlopen
             from bs4 import BeautifulSoup as soup 
 
-            def usdcheck():
-                IQXUSTHB = '31.21'
+            def usdscrapt():
                 req = Request('https://th.investing.com/currencies/usd-thb', headers={'User-Agent': 'Chrome/78.0'})
                 webopen = urlopen(req).read()
-
                 data = soup(webopen, 'html.parser')
 
                 usthbrate = data.findAll('div',{'class':'top bold inlineblock'})
@@ -79,8 +77,27 @@ def handle_message(event):
                 xusthbrate = xusthbrate.replace(',','')
                 xusthbrate = xusthbrate[1:]
                 xusthbrate = xusthbrate[7:13]
+                return[usthbrate,xusthbrate]
 
-                usthbspot = float(usthbrate)
+            def usdcheck():
+                IQXUSTHB = '29.76'
+                #chg for Quarter : Jan Apr Jul Sep
+                #1.015 1.03 0.985 0.97
+
+                uu = usdscrapt()
+                targetUp_01 = float(uu[0]) * 1.015
+                targetUp_01 = '%.2f'%targetUp_01
+
+                targetUp_02 = float(uu[0]) * 1.03
+                targetUp_02 = '%.2f'%targetUp_02
+                
+                targetDown_01 = float(uu[0]) * 0.985
+                targetDown_01 = '%.2f'%targetDown_01
+
+                targetDown_02 = float(uu[0]) * 0.97
+                targetDown_02 = '%.2f'%targetDown_02
+
+                usthbspot = float(uu[0])
                 usthbspot = '%.2f'%usthbspot
 
                 buy = float(usthbspot) + 0.02 #dif rate buy
@@ -89,12 +106,13 @@ def handle_message(event):
                 sale = '%.2f'%sale
 
                 text1 = 'IQXUSTB >> ' 
-                text2 = '\n' + IQXUSTHB +' >> ' + usthbrate + ' (' + xusthbrate + ')' + '\n' + 'ซื้อ ' + sale + ' / ขาย '+ buy
+                text2 = '\n' + IQXUSTHB +' >> ' + usthbspot + ' (' + uu[1] + ')' + '\n' + 'ซื้อ ' + sale + ' / ขาย '+ buy + '\n' + 'X : {} / {}'.format(targetUp_01,targetUp_02)
+                text3 = '\n' + IQXUSTHB +' >> ' + usthbspot + ' (' + uu[1] + ')' + '\n' + 'ซื้อ ' + sale + ' / ขาย '+ buy + '\n' + 'X : {} / {}'.format(targetDown_01,targetDown_02)
 
                 if float(usthbspot) >= float(IQXUSTHB):
                     word_to_reply2 = text1 + 'ค่าเงินอ่อน' + text2
                 else:
-                    word_to_reply2 = text1 + 'ค่าเงินแข็ง' + text2
+                    word_to_reply2 = text1 + 'ค่าเงินแข็ง' + text3
                 
                 print(word_to_reply2)
                 word_to_reply1 = '{} '.format(disname) + 'ค้นข้อมูล ' + text_from_user
@@ -113,11 +131,9 @@ def handle_message(event):
             from urllib.request import Request, urlopen
             from bs4 import BeautifulSoup as soup 
 
-            def wticheck():
-                IQXWTI = '51.55'
+            def wtiscrapt():
                 req = Request('https://th.investing.com/commodities/crude-oil', headers={'User-Agent': 'Chrome/78.0'})
                 webopen = urlopen(req).read()
-
                 data = soup(webopen, 'html.parser')
 
                 wtirate = data.findAll('div',{'class':'top bold inlineblock'})
@@ -133,39 +149,55 @@ def handle_message(event):
                 xwtirate = xwtirate.replace(',','')
                 xwtirate = xwtirate[1:]
                 xwtirate = xwtirate[6:11]
+                return[wtirate,xwtirate]
 
-                wtispot = float(wtirate)
+            def wticheck():
+                IQXWTI = '61.35'
+                #chg for Quarter : Jan Apr Jul Sep
+
+                #1.06 1.12 0.94 0.88
+                wti = wtiscrapt()
+                targetUp_01 = float(wti[0]) * 1.015
+                targetUp_01 = '%.2f'%targetUp_01
+
+                targetUp_02 = float(wti[0]) * 1.03
+                targetUp_02 = '%.2f'%targetUp_02
+                
+                targetDown_01 = float(wti[0]) * 0.985
+                targetDown_01 = '%.2f'%targetDown_01
+
+                targetDown_02 = float(wti[0]) * 0.97
+                targetDown_02 = '%.2f'%targetDown_02
+
+                wtispot = float(wti[0])
                 wtispot = '%.2f'%wtispot
 
-                text1 = 'IQXWTI >> ' 
-                text2 = '\n' + IQXWTI +' >> ' + wtispot + ' (' + xwtirate + ')'
+                text1 = 'IQXWTI >> Long' + '\n' + wti[0] +' >> ' + wtispot + ' (' + wti[1] + ')' + '\n' + 'X : {} / {}'.format(targetUp_01,targetUp_02)
+                text2 = 'IQXWTI >> Short' + '\n' + wti[0] +' >> ' + wtispot + ' (' + wti[1] + ')' + '\n' + 'X : {} / {}'.format(targetDown_01,targetDown_02)
 
                 if float(wtispot) >= float(IQXWTI):
-                    word_to_reply2 = text1 + 'Long' + text2
+                    word_to_reply3 = text1 
                 else:
-                    word_to_reply2 = text1 + 'Short' + text2
+                    word_to_reply3 = text2
                 
-                print(word_to_reply2)
+                print(word_to_reply3)
                 word_to_reply1 = '{} '.format(disname) + 'ค้นข้อมูล ' + text_from_user
 
                 text_to_reply1 = TextSendMessage(text = word_to_reply1)
-                text_to_reply2 = TextSendMessage(text = word_to_reply2)
+                text_to_reply3 = TextSendMessage(text = word_to_reply3)
 
                 line_bot_api.reply_message(
                         event.reply_token,
-                        messages=[text_to_reply2]
+                        messages=[text_to_reply3]
                     )
             wticheck()
 
         elif 'IQXGL' in text_from_user:
             from urllib.request import Request, urlopen
             from bs4 import BeautifulSoup as soup 
-            def goldcheck():
-                IQXGL = '1589.69'
-
+            def goldscrapt():
                 req = Request('https://th.investing.com/currencies/xau-usd', headers={'User-Agent': 'Chrome/78.0'})
                 webopen = urlopen(req).read()
-
                 data = soup(webopen, 'html.parser')
 
                 goldrate = data.findAll('div',{'class':'top bold inlineblock'})
@@ -182,27 +214,48 @@ def handle_message(event):
                 xgoldrate = xgoldrate[9:]
                 xgoldrate = xgoldrate[0:5]
 
-                gspot = float(goldrate)
+                return[goldrate,xgoldrate]
+
+            def goldcheck():
+                IQXGL = '1517.18'
+                #chg for Quarter : Jan Apr Jul Sep
+
+                #1.06 1.12 0.94 0.88
+                gg = goldscrapt()
+                targetUp_01 = float(gg[0]) * 1.03
+                targetUp_01 = '%.2f'%targetUp_01
+
+                targetUp_02 = float(gg[0]) * 1.06
+                targetUp_02 = '%.2f'%targetUp_02
+                
+                targetDown_01 = float(gg[0]) * 0.97
+                targetDown_01 = '%.2f'%targetDown_01
+
+                targetDown_02 = float(gg[0]) * 0.94
+                targetDown_02 = '%.2f'%targetDown_02
+
+                gspot = float(gg[0])
                 gspot = '%.2f'%gspot
+                gspot = str(gspot)
 
                 text1 = 'IQXGL >> ' 
-                text2 = '\n' + IQXGL +' >> ' + gspot + ' (' + xgoldrate + ')'
+                text2 = '\n' + IQXGL +' >> ' + gspot + ' (' + gg[1] + ')' + '\n' + 'X : {} / {}'.format(targetUp_01,targetUp_02)
+                text3 = '\n' + IQXGL +' >> ' + gspot + ' (' + gg[1] + ')' + '\n' + 'X : {} / {}'.format(targetDown_01,targetDown_02)
 
                 if float(gspot) >= float(IQXGL):
-                    word_to_reply2 = text1 + 'Long' + text2
-                
+                    word_to_reply4 = text1 + 'Long' + text2                
                 else:
-                    word_to_reply2 = text1 + 'Short' + text2
+                    word_to_reply4 = text1 + 'Short' + text3
 
-                print(word_to_reply2)
+                print(word_to_reply4)
                 word_to_reply1 = '{} '.format(disname) + 'ค้นข้อมูล ' + text_from_user
 
                 text_to_reply1 = TextSendMessage(text = word_to_reply1)
-                text_to_reply2 = TextSendMessage(text = word_to_reply2)
+                text_to_reply4 = TextSendMessage(text = word_to_reply4)
 
                 line_bot_api.reply_message(
                         event.reply_token,
-                        messages=[text_to_reply2]
+                        messages=[text_to_reply4]
                     )
             goldcheck()
 
@@ -267,8 +320,8 @@ def handle_message(event):
                     list = self.stock
 
                     dfY = data.DataReader(f'{list}', data_source="yahoo", start='2020-01-01', end=end)
-                    dfM = data.DataReader(f'{list}', data_source="yahoo", start='2020-02-01', end=end)
-                    dfW = data.DataReader(f'{list}', data_source="yahoo", start='2020-02-14', end=end)
+                    dfM = data.DataReader(f'{list}', data_source="yahoo", start='2020-03-01', end=end)
+                    dfW = data.DataReader(f'{list}', data_source="yahoo", start='2020-03-01', end=end)
 
                     #2020-01-01 = Y M D
 
