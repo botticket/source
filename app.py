@@ -172,8 +172,8 @@ def handle_message(event):
                 wtispot = float(wti[0])
                 wtispot = '%.2f'%wtispot
 
-                text1 = 'IQXWTI >> Long' + '\n' + wti[0] +' >> ' + wtispot + ' (' + wti[1] + ')' + '\n' + 'X : {} / {}'.format(targetUp_01,targetUp_02)
-                text2 = 'IQXWTI >> Short' + '\n' + wti[0] +' >> ' + wtispot + ' (' + wti[1] + ')' + '\n' + 'X : {} / {}'.format(targetDown_01,targetDown_02)
+                text1 = 'IQXWTI >> Long' + '\n' + IQXWTI +' >> ' + wtispot + ' (' + wti[1] + ')' + '\n' + 'X : {} / {}'.format(targetUp_01,targetUp_02)
+                text2 = 'IQXWTI >> Short' + '\n' + IQXWTI +' >> ' + wtispot + ' (' + wti[1] + ')' + '\n' + 'X : {} / {}'.format(targetDown_01,targetDown_02)
 
                 if float(wtispot) >= float(IQXWTI):
                     word_to_reply3 = text1 
@@ -321,7 +321,7 @@ def handle_message(event):
 
                     dfY = data.DataReader(f'{list}', data_source="yahoo", start='2020-01-01', end=end)
                     dfM = data.DataReader(f'{list}', data_source="yahoo", start='2020-03-01', end=end)
-                    dfW = data.DataReader(f'{list}', data_source="yahoo", start='2020-03-01', end=end)
+                    dfW = data.DataReader(f'{list}', data_source="yahoo", start='2020-03-09', end=end)
 
                     #2020-01-01 = Y M D
 
