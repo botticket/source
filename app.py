@@ -179,8 +179,8 @@ def handle_message(event):
                     list = self.stock
 
                     dfY = data.DataReader(f'{list}', data_source="yahoo", start=yearly, end=end)
-                    dfM = data.DataReader(f'{list}', data_source="yahoo", start=quarter, end=end)
-                    dfW = data.DataReader(f'{list}', data_source="yahoo", start=monthly, end=end)
+                    dfQ = data.DataReader(f'{list}', data_source="yahoo", start=quarter, end=end)
+                    dfM = data.DataReader(f'{list}', data_source="yahoo", start=monthly, end=end)
 
                     #2020-01-01 = Y M D
 
@@ -190,13 +190,13 @@ def handle_message(event):
                     OpenY  = '%.2f'%OpenY
                     OpenY = str(OpenY)
 
-                    OpenM = dfM['Open'].iloc[0]
+                    OpenQ = dfQ['Open'].iloc[0]
+                    OpenQ  = '%.2f'%OpenQ
+                    OpenQ = str(OpenQ)
+
+                    OpenM = dfQ['Open'].iloc[0]
                     OpenM  = '%.2f'%OpenM
                     OpenM = str(OpenM)
-
-                    OpenW = dfM['Open'].iloc[0]
-                    OpenW  = '%.2f'%OpenW
-                    OpenW = str(OpenW)
 
                     Close = float(f'{r[1]}')
                     Close  = '%.2f'%Close
@@ -210,16 +210,16 @@ def handle_message(event):
                     barY = '%.2f'%barY
                     barY = float(barY)
 
+                    barQ = ((float(Close) - float(OpenQ)) / float(OpenQ) )*100
+                    barQ = '%.2f'%barQ
+                    barQ = float(barQ)
+
                     barM = ((float(Close) - float(OpenM)) / float(OpenM) )*100
                     barM = '%.2f'%barM
                     barM = float(barM)
 
-                    barW = ((float(Close) - float(OpenW)) / float(OpenW) )*100
-                    barW = '%.2f'%barW
-                    barW = float(barW)
-
-                    Volume1 = dfM['Volume'].iloc[-1]
-                    Volume2 = dfM['Volume'].iloc[-2]
+                    Volume1 = dfQ['Volume'].iloc[-1]
+                    Volume2 = dfQ['Volume'].iloc[-2]
                     Volume = (float(Volume1)+float(Volume2))/2
                     Volume  = '%.0f'%Volume
                     Volume = str(Volume)
@@ -232,23 +232,23 @@ def handle_message(event):
                     request_val  = '{:,.0f}'.format(request_val)
                     request_val = str(request_val)
                     
-                    exitM1 = float(OpenM) * 1.06
-                    exitM1 = '%.2f'%exitM1
-                    exitM1 = str(exitM1)
+                    exitQ1 = float(OpenQ) * 1.06
+                    exitQ1 = '%.2f'%exitQ1
+                    exitQ1 = str(exitQ1)
 
-                    exitM2 = float(OpenM) * 1.16
-                    exitM2 = '%.2f'%exitM2
-                    exitM2 = str(exitM2)
+                    exitQ2 = float(OpenQ) * 1.16
+                    exitQ2 = '%.2f'%exitQ2
+                    exitQ2 = str(exitQ2)
 
-                    exitM3 = float(OpenM) * 1.26
-                    exitM3 = '%.2f'%exitM3
-                    exitM3 = str(exitM3)
+                    exitQ3 = float(OpenQ) * 1.26
+                    exitQ3 = '%.2f'%exitQ3
+                    exitQ3 = str(exitQ3)
 
-                    buyM = float(OpenM) * 1.01
-                    buyM = '%.2f'%buyM
-                    buyM = str(buyM) 
+                    buyQ = float(OpenQ) * 1.01
+                    buyQ = '%.2f'%buyQ
+                    buyQ = str(buyQ) 
 
-                    stopM = float(OpenM) * 0.985
+                    stopM = float(OpenQ) * 0.985
                     stopM = '%.2f'%stopM
                     stopM = str(stopM) 
 
@@ -272,9 +272,9 @@ def handle_message(event):
                     stopY = '%.2f'%stopY
                     stopY = str(stopY) 
 
-                    text1 = text_request +'\n' + 'O: ' + OpenM + ' ({} %)'.format(barM) +'\n' + 'B: ' + stopM + ' ~ '+ buyM +'\n' + 'X: ' + exitM1 + ' | ' + exitM2 
-                    text2 = text_request +'\n' + 'O ' + OpenM + ' ({} %)'.format(barM) +'\n' + 'B ' + stopM + ' ~ '+ buyM +'\n' + 'X ' + exitM1 + ' | ' + exitM2 
-                    text3 = 'รอซื้อ' + '\n' + text_request +'\n' + 'B ' + stopM + ' ~ '+ buyM
+                    text1 = text_request +'\n' + 'O: ' + OpenQ + ' ({} %)'.format(barQ) +'\n' + 'B: ' + stopM + ' ~ '+ buyQ +'\n' + 'X: ' + exitQ1 + ' | ' + exitQ2 
+                    text2 = text_request +'\n' + 'O ' + OpenQ + ' ({} %)'.format(barQ) +'\n' + 'B ' + stopM + ' ~ '+ buyQ +'\n' + 'X ' + exitQ1 + ' | ' + exitQ2 
+                    text3 = 'รอซื้อ' + '\n' + text_request +'\n' + 'B ' + stopM + ' ~ '+ buyQ
                     text4 = 'อย่าเพิ่งเข้า' + '\n'  + text_request +'\n' + 'O ' + OpenY + ' ({} %)'.format(barY) +'\n' + 'B ' + stopY + ' ~ '+ buyY 
                     text5 = 'ซื้อขายน้อย' + '\n' + text_request + '\n' + 'Val : ' + request_val + '\n' + 'Vol : ' + Volume
                     alert = 'ชนแนวต้าน'+ '\n'
@@ -282,31 +282,21 @@ def handle_message(event):
                     notice = 'ซื้อ'+ '\n'
 
                     if float(value) > 7500000:
-                        if barY >= 0:
-                            if barM > 6.00:
+                        if barY > 0:
+                            if barQ > 10.00:
                                 word_to_reply2 = str(alert + text1)
-                            elif barM >= 3.00:
-                                if barW >= 0:
-                                    word_to_reply2 = str(alert2 + text1)
-                                else:
-                                    word_to_reply2 = str(text3)
-                            elif barM >= 0.00:
-                                if barW >= 0:
+                            elif barQ >= 0.00:
+                                if barM >= 0:
                                     word_to_reply2 = str(notice + text1)
                                 else:
                                     word_to_reply2 = str(text3)
                             else:
                                 word_to_reply2 = str(text3)
-                        elif barM >= 0:
-                            if barM > 6.00:                             
+                        elif barQ > 0:
+                            if barQ > 10.00:                             
                                 word_to_reply2 = str(alert + text2)
-                            elif barM >= 3.00:
-                                if barW >= 0:
-                                    word_to_reply2 = str(alert2 + text2)
-                                else:
-                                    word_to_reply2 = str(text3)
-                            elif barM >= 0.00:
-                                if barW >= 0:
+                            elif barQ >= 0.00:
+                                if barM >= 0:
                                     word_to_reply2 = str(notice + text2)
                                 else:
                                     word_to_reply2 = str(text3)
@@ -318,9 +308,6 @@ def handle_message(event):
                         word_to_reply2 = str(text5)
 
                     print(word_to_reply2)
-                    word_to_reply1 = '{} '.format(disname) + 'ค้นข้อมูล ' + text_from_user
-
-                    text_to_reply1 = TextSendMessage(text = word_to_reply1)
                     text_to_reply2 = TextSendMessage(text = word_to_reply2)
                     line_bot_api.reply_message(
                             event.reply_token,
@@ -358,6 +345,6 @@ def RegisRichmenu(event):
     answer_button = QuickReply(items=[button_1,button_2,button_3])
 
 if __name__ == '__main__':
-    port = int(os.getenv('PORT', 5000))
+    port = int(os.getenv('PORT', 2000))
     #print("Starting app on port %d" % port)
     app.run(debug=False, port=port, host='0.0.0.0', threaded=True)
