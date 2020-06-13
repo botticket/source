@@ -7,6 +7,7 @@ from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage,FollowEvent,QuickReply,QuickReplyButton,MessageAction
 from line_notify import LineNotify
+from datetime import datetime,date
 
 
 today = date.today()
@@ -244,7 +245,7 @@ def handle_message(event):
                     exitQ3 = '%.2f'%exitQ3
                     exitQ3 = str(exitQ3)
 
-                    buyQ = float(OpenQ) * 1.01
+                    buyQ = float(OpenQ) * 1.02
                     buyQ = '%.2f'%buyQ
                     buyQ = str(buyQ) 
 
@@ -252,52 +253,56 @@ def handle_message(event):
                     stopM = '%.2f'%stopM
                     stopM = str(stopM) 
 
-                    exitY1 = float(OpenY) * 1.06
+                    exitY1 = float(OpenY) * 1.10
                     exitY1 = '%.2f'%exitY1
                     exitY1 = str(exitY1)
 
-                    exitY2 = float(OpenY) * 1.12
+                    exitY2 = float(OpenY) * 1.20
                     exitY2 = '%.2f'%exitY2
                     exitY2 = str(exitY2)
 
-                    exitY3 = float(OpenY) * 1.22
+                    exitY3 = float(OpenY) * 1.30
                     exitY3 = '%.2f'%exitY3
                     exitY3 = str(exitY3)
 
-                    buyY = float(OpenY) * 1.01
+                    buyY = float(OpenY) * 1.02
                     buyY = '%.2f'%buyY
                     buyY = str(buyY) 
 
-                    stopY = float(OpenY) * 0.985
+                    stopY = float(OpenY) * 0.98
                     stopY = '%.2f'%stopY
                     stopY = str(stopY) 
 
-                    text1 = text_request +'\n' + 'O: ' + OpenQ + ' ({} %)'.format(barQ) +'\n' + 'B: ' + stopM + ' ~ '+ buyQ +'\n' + 'X: ' + exitQ1 + ' | ' + exitQ2 
-                    text2 = text_request +'\n' + 'O ' + OpenQ + ' ({} %)'.format(barQ) +'\n' + 'B ' + stopM + ' ~ '+ buyQ +'\n' + 'X ' + exitQ1 + ' | ' + exitQ2 
-                    text3 = 'รอซื้อ' + '\n' + text_request +'\n' + 'B ' + stopM + ' ~ '+ buyQ
-                    text4 = 'อย่าเพิ่งเข้า' + '\n'  + text_request +'\n' + 'O ' + OpenY + ' ({} %)'.format(barY) +'\n' + 'B ' + stopY + ' ~ '+ buyY 
-                    text5 = 'ซื้อขายน้อย' + '\n' + text_request + '\n' + 'Val : ' + request_val + '\n' + 'Vol : ' + Volume
-                    alert = 'ชนแนวต้าน'+ '\n'
-                    alert2 = 'ไปต่อ'+ '\n'
-                    notice = 'ซื้อ'+ '\n'
+                    max_Qvalue = dfQ.nlargest(1, columns = 'High')
+                    max_Qvalue = max_Qvalue['High'].iloc[0]
+                    max_Qvalue = '%.2f'%max_Qvalue
+                    max_Qvalue = str(max_Qvalue) 
+
+                    text = text_request +'\n' + 'B: ' + OpenQ + ' ~ '+ buyQ +'\n' + 'HQ: ' + max_Qvalue +'\n' + 'X: ' + exitQ1 + ' | ' + exitQ2 + ' | ' + exitQ3 
+                    text3 = 'บอต' + '\n' + text_request +'\n' + 'B ' + OpenQ + ' ~ '+ buyQ
+                    text4 = 'บอต' + '\n'  + text_request +'\n' + 'O ' + OpenQ + ' ({} %)'.format(barQ) +'\n' + 'B ' + stopY + ' ~ '+ buyY 
+                    text5 = 'บอต' + '\n' + text_request + '\n' + 'Val : ' + request_val + '\n' + 'Vol : ' + Volume
+                    alert = 'บอต'+ '\n'
+                    alert2 = 'บอต'+ '\n'
+                    notice = 'บอต'+ '\n'
 
                     if float(value) > 7500000:
                         if barY > 0:
                             if barQ > 10.00:
-                                word_to_reply2 = str(alert + text1)
+                                word_to_reply2 = str(alert + text)
                             elif barQ >= 0.00:
                                 if barM >= 0:
-                                    word_to_reply2 = str(notice + text1)
+                                    word_to_reply2 = str(notice + text)
                                 else:
                                     word_to_reply2 = str(text3)
                             else:
                                 word_to_reply2 = str(text3)
                         elif barQ > 0:
                             if barQ > 10.00:                             
-                                word_to_reply2 = str(alert + text2)
+                                word_to_reply2 = str(alert + text)
                             elif barQ >= 0.00:
                                 if barM >= 0:
-                                    word_to_reply2 = str(notice + text2)
+                                    word_to_reply2 = str(notice + text)
                                 else:
                                     word_to_reply2 = str(text3)
                             else:
