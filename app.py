@@ -44,6 +44,11 @@ def linechat(text):
 
     notify.send(text)
 
+def sendimage(filename):
+	file = {'imageFile':open(filename,'rb')}
+	payload = {'message': 'update'}
+	return _lineNotify(payload,file)
+
 @app.route("/webhook", methods=['POST'])
 def callback():
 	# get X-Line-Signature header value
@@ -87,38 +92,8 @@ def handle_message(event):
             line_bot_api.reply_message(
                     event.reply_token,
                     messages=[text_to_reply]
-                )
-            
-
-        elif 'IQXWTI' in text_from_user:
-            text_list = [
-                'ฟังค์ชั่นที่คุณ {} ต้องการตอนนี้ได้จำกัดการใช้งาน กรุณาติดต่อแอดมินเพื่อใช้ฟังค์ชั่นดังกล่าว'.format(disname),
-                'ฟังค์ชั่นที่คุณ {} ต้องการตอนนี้ได้จำกัดการใช้งาน กรุณาติดต่อแอดมินเพื่อใช้ฟังค์ชั่นดังกล่าว'.format(disname),
-            ]
-
-            from random import choice
-            word_to_reply = choice(text_list)
-            text_to_reply = TextSendMessage(text = word_to_reply)
-            line_bot_api.reply_message(
-                    event.reply_token,
-                    messages=[text_to_reply]
-                )
-            
-        elif 'IQXGL' in text_from_user:
-  
-            text_list = [
-                'ฟังค์ชั่นที่คุณ {} ต้องการตอนนี้ได้จำกัดการใช้งาน กรุณาติดต่อแอดมินเพื่อใช้ฟังค์ชั่นดังกล่าว'.format(disname),
-                'ฟังค์ชั่นที่คุณ {} ต้องการตอนนี้ได้จำกัดการใช้งาน กรุณาติดต่อแอดมินเพื่อใช้ฟังค์ชั่นดังกล่าว'.format(disname),
-            ]
-
-            from random import choice
-            word_to_reply = choice(text_list)
-            text_to_reply = TextSendMessage(text = word_to_reply)
-            line_bot_api.reply_message(
-                    event.reply_token,
-                    messages=[text_to_reply]
-                )
-            
+                )            
+        
         else:
                     
             from bs4 import BeautifulSoup as soup 
@@ -289,43 +264,88 @@ def handle_message(event):
                     if float(value) > 7500000:
                         if barY > 0:
                             if barQ > 10.00:
-                                word_to_reply2 = str(alert + text)
+                                word_to_reply = str(alert + text)
                             elif barQ >= 0.00:
                                 if barM >= 0:
-                                    word_to_reply2 = str(notice + text)
+                                    word_to_reply = str(notice + text)
                                 else:
-                                    word_to_reply2 = str(text3)
+                                    word_to_reply = str(text3)
                             else:
-                                word_to_reply2 = str(text3)
+                                word_to_reply = str(text3)
                         elif barQ > 0:
                             if barQ > 10.00:                             
-                                word_to_reply2 = str(alert + text)
+                                word_to_reply = str(alert + text)
                             elif barQ >= 0.00:
                                 if barM >= 0:
-                                    word_to_reply2 = str(notice + text)
+                                    word_to_reply = str(notice + text)
                                 else:
-                                    word_to_reply2 = str(text3)
+                                    word_to_reply = str(text3)
                             else:
-                                word_to_reply2 = str(text4)                  
+                                word_to_reply = str(text4)                  
                         else:
-                            word_to_reply2 = str(text4)
+                            word_to_reply = str(text4)
                     else:
-                        word_to_reply2 = str(text5)
+                        word_to_reply = str(text5)
 
-                    print(word_to_reply2)
-                    text_to_reply2 = TextSendMessage(text = word_to_reply2)
+                    send_image =  r'C:\Users\Punnawit\Desktop\clone\source\\grh.png'
+
+                    dfQ.dropna(inplace=True)
+
+                    dfQ['OpenY'] = dfY['Open'].iloc[0]
+                    dfQ['OpenQ'] = dfQ['Open'].iloc[0]
+                    dfQ['OpenM'] = dfM['Open'].iloc[0]
+
+                    dfQ['ExitQ1'] = dfQ['OpenQ'] *1.20
+                    dfQ['ExitQ2'] = dfQ['OpenQ'] *1.40
+                    dfQ['ExitQ3'] = dfQ['OpenQ'] *1.60
+                    dfQ['fibo_Q1'] = dfQ['OpenY'] *0.90
+                    dfQ['fibo_Q2']  = dfQ['OpenY'] *0.80
+                    dfQ['fibo_Q3']  =dfQ['OpenY'] *0.70
+                    dfQ['fibo_Q4'] = dfQ['OpenY'] *0.60
+                    dfQ['fibo_Q5'] = dfQ['OpenY'] *0.50
+                    dfQ['fibo_Q55']  = dfQ['OpenY'] *0.40
+
+                    fig, ax = plt.subplots(figsize=(6,10))
+                    dfQ['Close'].plot()
+
+                    dfQ['OpenM'].plot(color="#AEAEAE")
+                    dfQ['OpenQ'].plot(color="#FC0000")
+                    dfQ['OpenY'].plot(color="#FC0000")		
+                    dfQ['ExitQ1'].plot(color="#00C13D",linestyle="-.") 
+                    dfQ['ExitQ2'].plot(color="#00C13D",linestyle="-.") 
+                    dfQ['ExitQ3'].plot(color="#00C13D",linestyle="-.") 
+                    dfQ['fibo_Q1'].plot(color="#AEAEAE",linestyle="dotted")
+                    dfQ['fibo_Q2'].plot(color="#AEAEAE",linestyle="dotted")
+                    dfQ['fibo_Q3'].plot(color="#AEAEAE",linestyle="dotted")
+                    dfQ['fibo_Q4'].plot(color="#AEAEAE",linestyle="dotted")
+                    dfQ['fibo_Q5'].plot(color="#AEAEAE",linestyle="dotted")
+                    dfQ['fibo_Q55'].plot(color="#AEAEAE",linestyle="dotted")
+                    
+                    for var in (dfQ['Close'], dfQ['OpenY'], dfQ['OpenQ'], dfQ['OpenM'], dfQ['ExitQ1'], dfQ['ExitQ2'], dfQ['ExitQ3'], dfQ['fibo_Q1'], dfQ['fibo_Q2'], dfQ['fibo_Q3'], dfQ['fibo_Q4'], dfQ['fibo_Q5'], dfQ['fibo_Q55']):
+                        plt.annotate('%0.2f' % var.iloc[-1], xy=(1, var.iloc[-1]), xytext=(8, 0), 
+                                    xycoords=('axes fraction', 'data'), textcoords='offset points')
+
+                    ax.xaxis.set_major_locator(mdates.MonthLocator())
+                    ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
+                    plt.grid(color="#AEAEAE", alpha=.5, linestyle="dotted")
+                    plt.ylabel("Price", fontsize= 12)
+                    plt.title(stock, fontsize= 15)
+                    plt.savefig(send_image)
+                    sendimage(send_image)
+
+                    # print(word_to_reply)
+                    text_to_reply = TextSendMessage(text = word_to_reply)
                     line_bot_api.reply_message(
                             event.reply_token,
-                            messages=[text_to_reply2]
+                            messages=[text_to_reply]
                         )
-                    
+
             for symbol in symbols:
                 stock(symbol).ticket()
     except:
         text_list = [
             '{} ไม่มีในฐานข้อมูล {} ลองใหม่อีกครั้ง'.format(text_from_user,disname),
             '{} ค้นหาหุ้น {} ไม่ถูกต้อง ลองใหม่อีกครั้ง'.format(disname, text_from_user),
-
         ]
 
         from random import choice
