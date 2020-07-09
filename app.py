@@ -454,7 +454,6 @@ def handle_message(event):
                 return [title,stockprice,change,pchange,stockupdate]
 
             r = request(code)
-
             text_request = '{} {} ({})'.format(r[0], r[1], r[2])
 
             class stock:
@@ -580,21 +579,7 @@ def handle_message(event):
                     support3 = float(OpenY) * 0.60
                     support3 = '%.2f'%support3
                     support3 = str(support3)
-                    
-                    textY = exit1 + ' | ' + exit2 + ' | ' + exit3 
-                    textQ = exit1 + ' | ' + exit2 + ' | ' + exit3 
-                    text2 = support3 + ' | ' + support2 + ' | ' + support1 
 
-                    alert1 = 'ชนแนวต้าน'
-                    alert2 = 'ไปต่อ'
-                    alert3 = 'ซื้อ'
-                    alert4 = 'อย่าเพิ่งเข้า'
-                    alert5 = 'กำลังย่อ'
-                    alert6 = 'ห้ามพลาด'
-                    alert7 = 'เด้ง'
-                    alert8 = 'ลงต่อ'
-                    alert9 = 'Vol น้อย'
-                    
                     from pyrebase import pyrebase
 
                     config_firebase = {
@@ -658,56 +643,44 @@ def handle_message(event):
                     upload = storage.child(upload_jpg_firebase).put(path_png_local)
                     send_url = 'https://firebasestorage.googleapis.com/v0/b/worldstock-iardyn.appspot.com/o/image%2Ffig.png?alt=media&token=e794bf2f-9208-4656-b15b-36095ff0877c'
 
-                    text = r[0]
-                    price_now = r[1] 
-                    change = r[2] 
-                    chgp = str(r[3])
-                    re_avg = '{}%'.format(barQ) + '\n' + 'H {} L {}'.format(max_valueQ,min_value)
+                    alert1 = 'ซื้อ'
+                    alert2 = 'ไปต่อ'
+                    alert3 = 'ขายนั่งรอ'
+                    alert4 = 'อย่าเพิ่งเข้า'
+                    alert5 = 'Vol น้อย'
+
+                    text = text_request +'\n' + 'B: {} + 2 ช่อง'.format(OpenQ) + '\n' + 'Y: {} | M: {}'.format(OpenY,OpenM) + '\n' + 'H: {} | L: {}'.format(max_valueQ,min_value)  
 
                     if float(value) > 7500000:
                         if  barY >= 0.00:
-                            if 0.00 < barY < 10.00:
-                                notice = alert6
-                                start = OpenY
-                                avg = re_avg      
-                            elif barQ > 12.00:
-                                notice = alert1
-                                start = OpenQ
-                                avg = re_avg
-                            elif barQ >= 0.00:
+                            if barQ >= 0.00:
                                 if barM >= 0.00:
-                                    notice = alert3
-                                    start = OpenQ
-                                    avg = re_avg
+                                    if 0.00 < barY < 3.00:
+                                        word_to_reply = str(alert1 + text)
+                                    elif 0.00 < barQ < 3.00:
+                                        word_to_reply = str(alert1 + text)
+                                    else:
+                                        word_to_reply = str(alert2 + text)
                                 else:
-                                    notice = alert5
-                                    start = OpenQ
-                                    avg = re_avg
+                                    word_to_reply = str(alert3 + text)
                             else:
-                                notice = alert4
-                                start = OpenQ
-                                avg = re_avg
+                                word_to_reply = str(alert4 + text)
                         else:
                             if barQ >= 0.00:
                                 if barM >= 0.00:
-                                    notice = alert3
-                                    start = OpenQ
-                                    avg = re_avg
+                                    if 0.00 < barQ < 3.00:
+                                        word_to_reply = str(alert1 + text)
+                                    else:
+                                        word_to_reply = str(alert2 + text)
                                 else:
-                                    notice = alert5
-                                    start = OpenQ
-                                    avg = re_avg
+                                    word_to_reply = str(alert3 + text)
                             else:
-                                notice = alert8
-                                start = OpenQ
-                                avg = re_avg
+                                word_to_reply = str(alert4 + text)
                     else:
                         notice = alert9
                         start = OpenQ
                         avg = re_avg
                     
-                    word_to_reply = str('{}'.format(notice) + '\n' + '{} {} {}'.format(text,price_now,change) + '\n' + '{} {}'.format(start,avg))
-
                     # print(word_to_reply)
                     text_to_reply = TextSendMessage(text = word_to_reply)
                     line_bot_api.reply_message(
@@ -737,7 +710,7 @@ def handle_message(event):
 def RegisRichmenu(event):
     userid = event.source.user_id
     disname = line_bot_api.get_profile(user_id=userid).display_name
-    line_bot_api.link_rich_menu_to_user(userid,'richmenu-7c24dec3902c2566ec4ba0fc66466dec')
+    line_bot_api.link_rich_menu_to_user(userid,'richmenu-2cc7b8be754d1833e8897cf8300d796f')
 
     button_1 = QuickReplyButton(action=MessageAction(lable='IQUSTB',text='IQUSTB'))
     button_2 = QuickReplyButton(action=MessageAction(lable='IQXGL',text='IQXGL'))
