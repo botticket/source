@@ -11,11 +11,13 @@ from datetime import datetime,date
 
 app = Flask(__name__)
 
+line_secret = "11116494ef78727c367cab0cd4584b9c"
+line_access_token = "dOt/F1F30Np2lf95rvGpYlj7w6WVVWKfK66IKtwL1jbD/sMCYcqOeRUiUuO/P6zWGvCr+v3Nf6mfYihfARJyUKvA32Jt/LCL7Im373bQABD0PttiBLkUnVYMp1SVKrYe7FoKEcvsjhkJD/j4hMXZ6wdB04t89/1O/w1cDnyilFU="
+
 channel_secret = line_secret
 channel_access_token = line_access_token
 line_bot_api = LineBotApi(channel_access_token)
 handler = WebhookHandler(channel_secret)
-
 
 IQXGL = '1780.50'
 IQXBRT = '41.61'
