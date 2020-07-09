@@ -645,13 +645,13 @@ def handle_message(event):
                     upload = storage.child(upload_jpg_firebase).put(path_png_local)
                     send_url = 'https://firebasestorage.googleapis.com/v0/b/worldstock-iardyn.appspot.com/o/image%2Ffig.png?alt=media&token=e794bf2f-9208-4656-b15b-36095ff0877c'
 
-                    alert1 = 'ซื้อ'
-                    alert2 = 'ไปต่อ'
-                    alert3 = 'ขายนั่งรอ'
-                    alert4 = 'อย่าเพิ่งเข้า'
-                    alert5 = 'Vol น้อย'
+                    alert1 = 'Alert : ซื้อ'
+                    alert2 = 'Alert : ไปต่อ'
+                    alert3 = 'Alert : ขายนั่งรอ'
+                    alert4 = 'Alert : อย่าเพิ่งเข้า'
+                    alert5 = 'Alert : Vol น้อย'
 
-                    text = text_request +'\n' + 'B: {} + 2 ช่อง'.format(OpenQ) + '\n' + 'Y: {} | M: {}'.format(OpenY,OpenM) + '\n' + 'H: {} | L: {}'.format(max_valueQ,min_value)  
+                    text = '\n' + text_request +'\n' + 'B: {} + 2 ช่อง'.format(OpenQ) + '\n' + 'Y: {} | M: {}'.format(OpenY,OpenM) + '\n' + 'H: {} | L: {}'.format(max_valueQ,min_value)+ '\n' + 'Graph {}'.format(send_url)  
 
                     if float(value) > 7500000:
                         if  barY >= 0.00:
