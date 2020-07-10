@@ -89,325 +89,20 @@ def handle_message(event):
     linechat(request_text)
 
     try:    
-        if 'IQXUSTB' in text_from_user:
-            from urllib.request import Request, urlopen
-            from bs4 import BeautifulSoup as soup
-
-            def thbscrapt():
-
-                req = Request('https://th.investing.com/currencies/usd-thb', headers={'User-Agent': 'Chrome/78.0'})
-                webopen = urlopen(req).read()
-                data = soup(webopen, 'html.parser')
-
-                thb_now = data.findAll('div',{'class':'top bold inlineblock'})
-                thb_now = thb_now[0].text
-                thb_now = thb_now.replace('\n',' ')
-                thb_now = thb_now.replace(',','')
-                thb_now = thb_now.replace(' ','')
-                thb_now = thb_now.replace('\xa0','')
-                thb_now = thb_now[0:6]
-
-                thb_chg = data.findAll('div',{'class':'top bold inlineblock'})
-                thb_chg = thb_chg[0].text
-                thb_chg = thb_chg.replace('\n',' ')
-                thb_chg = thb_chg.replace(',','')
-                thb_chg = thb_chg.replace(' ','')
-                thb_chg = thb_chg.replace('\xa0','')
-                thb_chg = thb_chg[6:12]
-
-                thb_pchg = data.findAll('div',{'class':'top bold inlineblock'})
-                thb_pchg = thb_pchg[0].text
-                thb_pchg = thb_pchg.replace('\n',' ')
-                thb_pchg = thb_pchg.replace(',','')
-                thb_pchg = thb_pchg.replace(' ','')
-                thb_pchg = thb_pchg.replace('\xa0','')
-                thb_pchg = thb_pchg[13:18]
-                
-                return[thb_now,thb_chg,thb_pchg]
-
-            def usdcheck():
-                thb = thbscrapt()
-
-                exit_long1 = float(thb[0]) * 1.015
-                exit_long1 = '%.2f'%exit_long1
-
-                exit_long2 = float(thb[0]) * 1.03
-                exit_long2 = '%.2f'%exit_long2
-
-                exit_long3 = float(thb[0]) * 1.045
-                exit_long3 = '%.2f'%exit_long3      
-
-                exit_short1 = float(thb[0]) * 0.985
-                exit_short1 = '%.2f'%exit_short1
-
-                exit_short2 = float(thb[0]) * 0.97
-                exit_short2 = '%.2f'%exit_short2
-
-                exit_short3 = float(thb[0]) * 0.955
-                exit_short3 = '%.2f'%exit_short3
-
-                LongY = float(IQUSTB) * 1.005
-                LongY = '%.2f'%LongY
-
-                stop_longY = float(IQUSTB) * 0.995
-                stop_longY = '%.2f'%stop_longY     
-
-                shortY = float(IQUSTB) * 0.995
-                shortY = '%.2f'%shortY
-
-                stop_shortY = float(IQUSTB) * 1.005
-                stop_shortY = '%.2f'%stop_shortY                    
-
-                price_now = float(thb[0])
-                price_now = '%.2f'%price_now
-                price_now = str(price_now)
-                
-                barM = float(price_now) - float(IQUSTB)
-                chgp = str(thb[2])
-
-                text1 = exit_long1 + ' | ' + exit_long2 + ' | ' + exit_long3 
-                text2 = exit_short1 + ' | ' + exit_short2 + ' | ' + exit_short3 
-
-                alert1 = 'Long'
-                alert2 = 'Short'
-
-                text = text_from_user
-                change = str(thb[1]) 
-
-                if barM >= 0:
-                    notice = alert1
-                    start = IQUSTB
-                    buy = LongY
-                    stop = stop_longY
-                    target = text1
-                    number = '1'
-                else:
-                    notice = alert2
-                    start = IQUSTB
-                    buy = shortY
-                    stop = stop_shortY
-                    target = text2 
-                    number = '2'
-                
-                word_to_reply = '{}'.format(text) + '\n' + 'now {} {} ({}%)'.format(price_now,change,chgp)
-                result = 'Position: {}'.format(notice) + '\n' + 'Range: {} - {} '.format(start,buy) + '\n' + 'Stop: {}'.format(stop) + '\n' + 'Target: {}'.format(target)
-                linechat(word_to_reply)
-                print(number)
-
-                bubble = flex_usdcheck(text,price_now,change,chgp,notice,start,buy,stop,target)
-                flex_to_reply = SetMessage_Object(bubble)
-                reply_msg(reply_token,data=flex_to_reply,bot_access_key=channel_access_token)
-                return 'OK'
-            usdcheck()
-
-        elif 'IQXGL' in text_from_user:
-            from urllib.request import Request, urlopen
-            from bs4 import BeautifulSoup as soup 
-
-            def goldscrapt():
-                req = Request('https://investing.com/currencies/xau-usd', headers={'User-Agent': 'Chrome/78.0'})
-                webopen = urlopen(req).read()
-                data = soup(webopen, 'html.parser')
-
-                gold_now = data.findAll('div',{'class':'top bold inlineblock'})
-                gold_now = gold_now[0].text
-                gold_now = gold_now.replace('\n',' ')
-                gold_now = gold_now.replace(',','')
-                gold_now = gold_now[1:]
-                gold_now = gold_now[0:8]
-
-                goldchange = data.findAll('div',{'class':'top bold inlineblock'})
-                goldchange = goldchange[0].text
-                goldchange = goldchange.replace('\n',' ')
-                goldchange = goldchange.replace(',','')
-                goldchange = goldchange[9:]
-                goldchange = goldchange[0:5]
-
-                chgp = data.findAll('div',{'class':'top bold inlineblock'})
-                chgp = chgp[0].text
-                chgp = chgp.replace('\n',' ')
-                chgp = chgp.replace(',','')
-                chgp = chgp[18:]
-
-                return[gold_now,goldchange,chgp]
-
-            def goldcheck():
-                gg = goldscrapt()
-
-                exit_long1 = float(gg[0]) * 1.015
-                exit_long1 = '%.2f'%exit_long1
-
-                exit_long2 = float(gg[0]) * 1.03
-                exit_long2 = '%.2f'%exit_long2
-
-                exit_long3 = float(gg[0]) * 1.045
-                exit_long3 = '%.2f'%exit_long3      
-
-                exit_short1 = float(gg[0]) * 0.985
-                exit_short1 = '%.2f'%exit_short1
-
-                exit_short2 = float(gg[0]) * 0.97
-                exit_short2 = '%.2f'%exit_short2
-
-                exit_short3 = float(gg[0]) * 0.955
-                exit_short3 = '%.2f'%exit_short3
-
-                LongY = float(IQXGL) * 1.005
-                LongY = '%.2f'%LongY
-
-                stop_longY = float(IQXGL) * 0.995
-                stop_longY = '%.2f'%stop_longY     
-
-                shortY = float(IQXGL) * 0.995
-                shortY = '%.2f'%shortY
-
-                stop_shortY = float(IQXGL) * 1.005
-                stop_shortY = '%.2f'%stop_shortY                    
-
-                price_now = float(gg[0])
-                price_now = '%.2f'%price_now
-                price_now = str(price_now)
-                
-                barM = float(price_now) - float(IQXGL)
-                chgp = str(gg[2])
-
-                text1 = exit_long1 + ' | ' + exit_long2 + ' | ' + exit_long3 
-                text2 = exit_short1 + ' | ' + exit_short2 + ' | ' + exit_short3 
-
-                alert1 = 'Long'
-                alert2 = 'Short'
-
-                text = text_from_user
-                change = str(gg[1]) 
-
-                if barM >= 0:
-                    notice = alert1
-                    start = IQXGL
-                    buy = LongY
-                    stop = stop_longY
-                    target = text1
-                    number = '1'
-                else:
-                    notice = alert2
-                    start = IQXGL
-                    buy = shortY
-                    stop = stop_shortY
-                    target = text2 
-                    number = '2'
-                
-                word_to_reply = '{}'.format(text) + '\n' + 'now {} {} ({}%)'.format(price_now,change,chgp)
-                result = 'Position: {}'.format(notice) + '\n' + 'Range: {} - {} '.format(start,buy) + '\n' + 'Stop: {}'.format(stop) + '\n' + 'Target: {}'.format(target)
-                linechat(word_to_reply)
-                bubble = flex_goldcheck(text,price_now,change,chgp,notice,start,buy,stop,target)
-                
-                flex_to_reply = SetMessage_Object(bubble)
-                reply_msg(reply_token,data=flex_to_reply,bot_access_key=channel_access_token)
-                return 'OK'
-            goldcheck()
-
-        elif 'IQXBRT' in text_from_user:
-            from urllib.request import Request, urlopen
-            from bs4 import BeautifulSoup as soup 
-
-            def wtiscrapt():
-                req = Request('https://www.investing.com/commodities/brent-oil', headers={'User-Agent': 'Chrome/78.0'})
-                webopen = urlopen(req).read()
-                data = soup(webopen, 'html.parser')
-
-                wti_now = data.findAll('div',{'class':'top bold inlineblock'})
-                wti_now = wti_now[0].text
-                wti_now = wti_now.replace('\n',' ')
-                wti_now = wti_now.replace(',','')
-                wti_now = wti_now[1:]
-                wti_now = wti_now[0:6]
-
-                wtichange = data.findAll('div',{'class':'top bold inlineblock'})
-                wtichange = wtichange[0].text
-                wtichange = wtichange.replace('\n',' ')
-                wtichange = wtichange.replace(',','')
-                wtichange = wtichange[1:]
-                wtichange = wtichange[6:11]
-
-                chgp = data.findAll('div',{'class':'top bold inlineblock'})
-                chgp = chgp[0].text
-                chgp = chgp.replace('\n',' ')
-                chgp = chgp.replace(',','')
-                chgp = chgp[16:]
-                return[wti_now,wtichange,chgp]
-
-            def wticheck():
-                wti = wtiscrapt()
-
-                exit_long1 = float(wti[0]) * 1.04
-                exit_long1 = '%.2f'%exit_long1
-
-                exit_long2 = float(wti[0]) * 1.08
-                exit_long2 = '%.2f'%exit_long2
-
-                exit_long3 = float(wti[0]) * 1.12
-                exit_long3 = '%.2f'%exit_long3      
-
-                exit_short1 = float(wti[0]) * 0.96
-                exit_short1 = '%.2f'%exit_short1
-
-                exit_short2 = float(wti[0]) * 0.92
-                exit_short2 = '%.2f'%exit_short2
-
-                exit_short3 = float(wti[0]) * 0.88
-                exit_short3 = '%.2f'%exit_short3
-
-                LongY = float(IQXBRT) * 1.01
-                LongY = '%.2f'%LongY
-
-                stop_longY = float(IQXBRT) * 0.985
-                stop_longY = '%.2f'%stop_longY     
-
-                shortY = float(IQXBRT) * 0.985
-                shortY = '%.2f'%shortY
-
-                stop_shortY = float(IQXBRT) * 1.01
-                stop_shortY = '%.2f'%stop_shortY                    
-
-                price_now = float(wti[0])
-                price_now = '%.2f'%price_now
-                price_now = str(price_now)
-                
-                barQ = float(price_now) - float(IQXBRT)
-                chgp = str(wti[2])
-
-                text1 = exit_long1 + ' | ' + exit_long2 + ' | ' + exit_long3 
-                text2 = exit_short1 + ' | ' + exit_short2 + ' | ' + exit_short3 
-
-                alert1 = 'Long'
-                alert2 = 'Short'
-
-                text = text_from_user
-                change = str(wti[1]) 
-
-                if barQ >= 0:
-                    notice = alert1
-                    start = IQXBRT
-                    buy = LongY
-                    stop = stop_longY
-                    target = text1
-                    number = '1'
-                else:
-                    notice = alert2
-                    start = IQXBRT
-                    buy = shortY
-                    stop = stop_shortY
-                    target = text2 
-                    number = '2'
-                
-                word_to_reply = '{}'.format(text) + '\n' + 'now {} {} ({}%)'.format(price_now,change,chgp)
-                result = 'Position: {}'.format(notice) + '\n' + 'Range: {} - {} '.format(start,buy) + '\n' + 'Stop: {}'.format(stop) + '\n' + 'Target: {}'.format(target)
-                linechat(word_to_reply)
-                bubble = flex_wticheck(text,price_now,change,chgp,notice,start,buy,stop,target)
-                
-                flex_to_reply = SetMessage_Object(bubble)
-                reply_msg(reply_token,data=flex_to_reply,bot_access_key=channel_access_token)
-                return 'OK'
-            wticheck()
+        if 'สวัสดี' in text_from_user:    
+            text_list = [
+                'สวัสดีจ้า คุณ {} '.format(disname),
+                'สวัสดีจ้า คุณ {} วันนี้จะเล่นตัวไหนดี'.format(disname),
+            ]
+
+            from random import choice
+            word_to_reply = choice(text_list)
+            text_to_reply = TextSendMessage(text = word_to_reply)
+            line_bot_api.reply_message(
+                    event.reply_token,
+                    messages=[text_to_reply]
+                )
+            return 'OK'
 
         else:
                             
@@ -679,17 +374,17 @@ def handle_message(event):
                             else:
                                 word_to_reply = str(alert4 + text)
                     else:
-                        notice = alert9
-                        start = OpenQ
-                        avg = re_avg
+                        word_to_reply = str(alert5 + text)
+
                     
-                    # print(word_to_reply)
                     text_to_reply = TextSendMessage(text = word_to_reply)
                     line_bot_api.reply_message(
                             event.reply_token,
                             messages=[text_to_reply]
                         )
 
+                    linechat(word_to_reply)
+                    
             for symbol in symbols:
                 stock(symbol).ticket()
     except:
@@ -712,12 +407,10 @@ def handle_message(event):
 def RegisRichmenu(event):
     userid = event.source.user_id
     disname = line_bot_api.get_profile(user_id=userid).display_name
-    line_bot_api.link_rich_menu_to_user(userid,'richmenu-2cc7b8be754d1833e8897cf8300d796f')
+    line_bot_api.link_rich_menu_to_user(userid,'richmenu-073dc85eff8bb8351e8d53769c025029')
 
-    button_1 = QuickReplyButton(action=MessageAction(lable='IQUSTB',text='IQUSTB'))
-    button_2 = QuickReplyButton(action=MessageAction(lable='IQXGL',text='IQXGL'))
-    button_3 = QuickReplyButton(action=MessageAction(lable='IQXBRT',text='IQXBRT'))
-    answer_button = QuickReply(items=[button_1,button_2,button_3])
+    button_1 = QuickReplyButton(action=MessageAction(lable='สวัสดี',text='สวัสดี'))
+    answer_button = QuickReply(items=[button_1])
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 2000))
