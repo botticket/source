@@ -299,6 +299,12 @@ def handle_message(event):
                     dfQ['OpenQ'] = dfQ['Open'].iloc[0]
                     dfQ['OpenM'] = dfM['Open'].iloc[0]
 
+                    min_value = dfY.nsmallest(1, columns = 'Low')
+                    min_value = min_value['Low'].iloc[0]
+                    min_value = '%.2f'%min_value
+                    min_value = str(min_value) 
+                    
+                    dfQ['min_value'] = float(min_value)
                     dfQ['ExitQ1'] = dfQ['OpenQ'] *1.20
                     dfQ['ExitQ2'] = dfQ['OpenQ'] *1.40
                     dfQ['ExitQ3'] = dfQ['OpenQ'] *1.60
@@ -314,7 +320,9 @@ def handle_message(event):
 
                     dfQ['OpenM'].plot(color="#AEAEAE")
                     dfQ['OpenQ'].plot(color="#FC0000")
-                    dfQ['OpenY'].plot(color="#FC0000")		
+                    dfQ['OpenY'].plot(color="#FC0000")
+                    dfQ['min_value'].plot(color="#E5A100")		
+
                     dfQ['ExitQ1'].plot(color="#00C13D",linestyle="-.") 
                     dfQ['ExitQ2'].plot(color="#00C13D",linestyle="-.") 
                     dfQ['ExitQ3'].plot(color="#00C13D",linestyle="-.") 
@@ -325,7 +333,7 @@ def handle_message(event):
                     dfQ['fibo_Q5'].plot(color="#AEAEAE",linestyle="dotted")
                     dfQ['fibo_Q55'].plot(color="#AEAEAE",linestyle="dotted")
                     
-                    for var in (dfQ['Close'], dfQ['OpenY'], dfQ['OpenQ'], dfQ['OpenM'], dfQ['ExitQ1'], dfQ['ExitQ2'], dfQ['ExitQ3'], dfQ['fibo_Q1'], dfQ['fibo_Q2'], dfQ['fibo_Q3'], dfQ['fibo_Q4'], dfQ['fibo_Q5'], dfQ['fibo_Q55']):
+                    for var in (dfQ['Close'],dfQ['min_value'], dfQ['OpenY'], dfQ['OpenQ'], dfQ['OpenM'], dfQ['ExitQ1'], dfQ['ExitQ2'], dfQ['ExitQ3'], dfQ['fibo_Q1'], dfQ['fibo_Q2'], dfQ['fibo_Q3'], dfQ['fibo_Q4'], dfQ['fibo_Q5'], dfQ['fibo_Q55']):
                         plt.annotate('%0.2f' % var.iloc[-1], xy=(1, var.iloc[-1]), xytext=(8, 0), 
                                     xycoords=('axes fraction', 'data'), textcoords='offset points')
 
@@ -375,7 +383,6 @@ def handle_message(event):
                                 word_to_reply = str(alert4 + text)
                     else:
                         word_to_reply = str(alert5 + text)
-
                     
                     text_to_reply = TextSendMessage(text = word_to_reply)
                     line_bot_api.reply_message(
