@@ -214,6 +214,11 @@ def handle_message(event):
                     request_val  = '{:,.0f}'.format(request_val)
                     request_val = str(request_val)
                     
+                    dfQ['mValue'] = (dfQ['Close'] - dfQ['Open']) * dfQ['Volume']
+                    mValue = dfQ['mValue'].iloc[-1]
+                    mValue = int(mValue)
+                    mValue = "{:,}".format(mValue)
+
                     exit1 = float(OpenQ) * 1.20
                     exit1 = '%.2f'%exit1
                     exit1 = str(exit1)
@@ -354,7 +359,7 @@ def handle_message(event):
                     alert4 = 'Alert : อย่าเพิ่งเข้า'
                     alert5 = 'Alert : Vol น้อย'
 
-                    text = '\n' + text_request +'\n' + 'B: {} + 2 ช่อง'.format(OpenQ) + '\n' + 'Y: {} | M: {}'.format(OpenY,OpenM) + '\n' + 'H: {} | L: {}'.format(max_valueQ,min_value)+ '\n' + 'graphinfo : '+ send_url
+                    text = '\n' + text_request +'\n' + 'B: {} + 2 ช่อง'.format(OpenQ) + '\n' + 'Y: {} | M: {}'.format(OpenY,OpenM) + '\n' + 'H: {} | L: {}'.format(max_valueQ,min_value) + 'margin {}'.format(mValue) + '\n' + 'graphinfo : '+ send_url
 
                     if float(value) > 7500000:
                         if  barY >= 0.00:
