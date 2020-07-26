@@ -3,10 +3,7 @@ import requests
 
 def ReplyMessage(Reply_token, TextMessage, Line_Access_Token):
     LINE_API = 'https://api.line.me/v2/bot/message/reply'
-
     Authorization = 'Bearer {}'.format(Line_Access_Token) 
-    # print(Authorization)
-    
     headers = {
         'Content-Type': 'application/json; charset=UTF-8',
         'Authorization':Authorization
@@ -22,20 +19,15 @@ def ReplyMessage(Reply_token, TextMessage, Line_Access_Token):
             "text":'ท่านสามารถใช้งานโดยการพิมพ์ประโยคที่ต้องการค้นหาค่ะ'
         }]
     }
-    ##before
-    print(type(data))
     
     data = json.dumps(data) ## dump dict >> Json Object
-    ##after
-    print(type(data))
-
     r = requests.post(LINE_API, headers=headers, data=data) 
     return 'OK'
 
 def PushMessage(userid, TextMessage, Line_Access_Token):
     LINE_API = 'https://api.line.me/v2/bot/message/push'
 
-    Authorization = 'Bearer {}'.format(Line_Access_Token) ##à¸—à¸µà¹ˆà¸¢à¸²à¸§à¹†
+    Authorization = 'Bearer {}'.format(Line_Access_Token) 
     print(Authorization)
     
     headers = {
@@ -52,16 +44,12 @@ def PushMessage(userid, TextMessage, Line_Access_Token):
             },
             {
                 "type":"text",
-                "text":"Hello, world2"
+                "text":"Hello"
             }
         ]
     }
-    ##before
-    print(type(data))
-    
+
     data = json.dumps(data) ## dump dict >> Json Object
-    ##after
-    print(type(data))
 
     r = requests.post(LINE_API, headers=headers, data=data)
     print(r) 
@@ -73,7 +61,6 @@ def SetMessage_Object(Message_data,Quick_Reply = None):
     if type(Message_data) is list:
         for message in Message_data:
             file_data['messages'].append(message)
-
     else :
         file_data['messages'].append(Message_data)
         
@@ -89,9 +76,8 @@ def reply_msg(reply_token,data,bot_access_key):
   'Authorization': Authorization}
 
     data['replyToken'] = reply_token
-    #### dumps file จาก dict ให้เป็น json
     data = json.dumps(data)
-    r = requests.post(LINE_API, headers=headers, data=data) # ส่งข้อมูล
+    r = requests.post(LINE_API, headers=headers, data=data) 
     print(r.content)
     return r
 

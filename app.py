@@ -103,7 +103,20 @@ def handle_message(event):
                     messages=[text_to_reply]
                 )
             return 'OK'
+        elif 'hi' in text_from_user:    
+            text_list = [
+                'Hello {} '.format(disname),
+                'Good day {} '.format(disname),
+            ]
 
+            from random import choice
+            word_to_reply = choice(text_list)
+            text_to_reply = TextSendMessage(text = word_to_reply)
+            line_bot_api.reply_message(
+                    event.reply_token,
+                    messages=[text_to_reply]
+                )
+            return 'OK'
         else:
                             
             from pandas_datareader import data 
@@ -300,45 +313,50 @@ def handle_message(event):
 
                     dfQ.dropna(inplace=True)
 
-                    dfQ['OpenY'] = dfY['Open'].iloc[0]
-                    dfQ['OpenQ'] = dfQ['Open'].iloc[0]
-                    dfQ['OpenM'] = dfM['Open'].iloc[0]
-
                     min_value = dfY.nsmallest(1, columns = 'Low')
                     min_value = min_value['Low'].iloc[0]
                     min_value = '%.2f'%min_value
                     min_value = str(min_value) 
                     
-                    dfQ['min_value'] = float(min_value)
-                    dfQ['ExitQ1'] = dfQ['OpenQ'] *1.20
-                    dfQ['ExitQ2'] = dfQ['OpenQ'] *1.40
-                    dfQ['ExitQ3'] = dfQ['OpenQ'] *1.60
-                    dfQ['fibo_Q1'] = dfQ['OpenY'] *0.90
-                    dfQ['fibo_Q2']  = dfQ['OpenY'] *0.80
-                    dfQ['fibo_Q3']  =dfQ['OpenY'] *0.70
-                    dfQ['fibo_Q4'] = dfQ['OpenY'] *0.60
-                    dfQ['fibo_Q5'] = dfQ['OpenY'] *0.50
-                    dfQ['fibo_Q55']  = dfQ['OpenY'] *0.40
+                    dfY['OpenY'] = dfY['Open'].iloc[0]
+                    dfY['OpenQ'] = dfQ['Open'].iloc[0]
+                    dfY['OpenM'] = dfM['Open'].iloc[0]
+                    dfY['limitC'] = dfY['OpenM'] *1.02
 
-                    fig, ax = plt.subplots(figsize=(6,10))
-                    dfQ['Close'].plot()
+                    dfY['ExitQ1'] = dfY['OpenQ'] *1.20
+                    dfY['ExitQ2'] = dfY['OpenQ'] *1.40
+                    dfY['ExitQ3'] = dfY['OpenQ'] *1.60
 
-                    dfQ['OpenM'].plot(color="#AEAEAE")
-                    dfQ['OpenQ'].plot(color="#FC0000")
-                    dfQ['OpenY'].plot(color="#FC0000")
-                    dfQ['min_value'].plot(color="#E5A100")		
+                    dfY['fibo_Q1'] = dfY['OpenY'] *0.90
+                    dfY['fibo_Q2']  = dfY['OpenY'] *0.80
+                    dfY['fibo_Q3']  =dfY['OpenY'] *0.70
+                    dfY['fibo_Q4'] = dfY['OpenY'] *0.60
+                    dfY['fibo_Q5'] = dfY['OpenY'] *0.50
+                    dfY['fibo_Q6']  = dfY['OpenY'] *0.40
+                    dfY['min_value'] = float(min_value)
 
-                    dfQ['ExitQ1'].plot(color="#00C13D",linestyle="-.") 
-                    dfQ['ExitQ2'].plot(color="#00C13D",linestyle="-.") 
-                    dfQ['ExitQ3'].plot(color="#00C13D",linestyle="-.") 
-                    dfQ['fibo_Q1'].plot(color="#AEAEAE",linestyle="dotted")
-                    dfQ['fibo_Q2'].plot(color="#AEAEAE",linestyle="dotted")
-                    dfQ['fibo_Q3'].plot(color="#AEAEAE",linestyle="dotted")
-                    dfQ['fibo_Q4'].plot(color="#AEAEAE",linestyle="dotted")
-                    dfQ['fibo_Q5'].plot(color="#AEAEAE",linestyle="dotted")
-                    dfQ['fibo_Q55'].plot(color="#AEAEAE",linestyle="dotted")
+                    fig, ax = plt.subplots(figsize=(14,7))
+
+                    dfY['Close'].plot()
+                    dfY['OpenM'].plot(color="#FFD100")
+                    dfY['OpenQ'].plot(color="#00A22F")
+                    dfY['OpenY'].plot(color="#FF0000")
+
+                    dfY['limitC'].plot(color="#FFD100")
+                    dfY['min_value'].plot(color="#FFD100",linestyle="-.")		
+
+                    dfY['ExitQ1'].plot(color="#553E3E",linestyle="-.") 
+                    dfY['ExitQ2'].plot(color="#553E3E",linestyle="-.") 
+                    dfY['ExitQ3'].plot(color="#553E3E",linestyle="-.") 
+
+                    dfY['fibo_Q1'].plot(color="#AEAEAE",linestyle="dotted")
+                    dfY['fibo_Q2'].plot(color="#AEAEAE",linestyle="dotted")
+                    dfY['fibo_Q3'].plot(color="#AEAEAE",linestyle="dotted")
+                    dfY['fibo_Q4'].plot(color="#AEAEAE",linestyle="dotted")
+                    dfY['fibo_Q5'].plot(color="#AEAEAE",linestyle="dotted")
+                    dfY['fibo_Q6'].plot(color="#AEAEAE",linestyle="dotted")
                     
-                    for var in (dfQ['Close'],dfQ['min_value'], dfQ['OpenY'], dfQ['OpenQ'], dfQ['OpenM'], dfQ['ExitQ1'], dfQ['ExitQ2'], dfQ['ExitQ3'], dfQ['fibo_Q1'], dfQ['fibo_Q2'], dfQ['fibo_Q3'], dfQ['fibo_Q4'], dfQ['fibo_Q5'], dfQ['fibo_Q55']):
+                    for var in (dfY['Close'],dfY['min_value'], dfY['OpenY'], dfY['OpenQ'], dfY['OpenM'],dfY['limitC'], dfY['ExitQ1'], dfY['ExitQ2'], dfY['ExitQ3'], dfY['fibo_Q1'], dfY['fibo_Q2'], dfY['fibo_Q3'], dfY['fibo_Q4'], dfY['fibo_Q5'], dfY['fibo_Q6']):
                         plt.annotate('%0.2f' % var.iloc[-1], xy=(1, var.iloc[-1]), xytext=(8, 0), 
                                     xycoords=('axes fraction', 'data'), textcoords='offset points')
 
@@ -426,5 +444,4 @@ def RegisRichmenu(event):
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 2000))
-    #print("Starting app on port %d" % port)
     app.run(debug=False, port=port, host='0.0.0.0', threaded=True)
