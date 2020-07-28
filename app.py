@@ -377,7 +377,7 @@ def handle_message(event):
                     alert4 = 'Alert : อย่าเพิ่งเข้า'
                     alert5 = 'Alert : Vol น้อย'
 
-                    text = '\n' + text_request +'\n' + 'B: {} + 2 ช่อง'.format(OpenQ) + '\n' + 'Y: {} | M: {}'.format(OpenY,OpenM) + '\n' + 'H: {} | L: {}'.format(max_valueQ,min_value) + '\n' + 'margin {}'.format(mValue) + '\n' + 'graphinfo : '+ send_url
+                    text = '\n' + text_request +'\n' + 'B: {} + 2 ช่อง'.format(OpenQ) + '\n' + 'Y: {} | M: {}'.format(OpenY,OpenM) + '\n' + 'H: {} | L: {}'.format(max_valueQ,min_value) + '\n' + 'margin {}'.format(mValue) 
 
                     if float(value) > 7500000:
                         if  barY >= 0.00:
@@ -413,7 +413,7 @@ def handle_message(event):
                             messages=[text_to_reply]
                         )
 
-                    linechat(word_to_reply)
+                    linechat(word_to_reply + send_url)
                     
             for symbol in symbols:
                 stock(symbol).ticket()
