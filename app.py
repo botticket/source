@@ -413,7 +413,7 @@ def handle_message(event):
                             messages=[text_to_reply]
                         )
 
-                    linechat(word_to_reply +'\n' + send_url)
+                    linechat(word_to_reply + send_url)
                     
             for symbol in symbols:
                 stock(symbol).ticket()
