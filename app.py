@@ -163,9 +163,6 @@ def handle_message(event):
                 stockupdate = stockupdate[13:]
                 return [title,stockprice,change,pchange,stockupdate]
 
-            r = request(code)
-            text_request = '{} {} ({})'.format(r[0], r[1], r[2])
-
             class stock:
                 def __init__(self,stock):
                     self.stock = stock
@@ -295,6 +292,9 @@ def handle_message(event):
                     support3 = '%.2f'%support3
                     support3 = str(support3)
 
+                    r = request(code)
+                    text_request = '{} {} > {} ({})'.format(r[0],OpenM, r[1], r[2])
+
                     from pyrebase import pyrebase
 
                     config_firebase = {
@@ -413,7 +413,7 @@ def handle_message(event):
                             messages=[text_to_reply]
                         )
 
-                    linechat(word_to_reply + send_url)
+                    linechat(word_to_reply +'\n' + send_url)
                     
             for symbol in symbols:
                 stock(symbol).ticket()
