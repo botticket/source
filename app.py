@@ -163,6 +163,9 @@ def handle_message(event):
                 stockupdate = stockupdate[13:]
                 return [title,stockprice,change,pchange,stockupdate]
 
+            r = checkstock(code)
+            text_request = '{} {} ({})'.format(r[0], r[1], r[2])
+
             class stock:
                 def __init__(self,stock):
                     self.stock = stock
@@ -291,9 +294,6 @@ def handle_message(event):
                     support3 = float(OpenY) * 0.60
                     support3 = '%.2f'%support3
                     support3 = str(support3)
-
-                    r = checkstock(code)
-                    text_request = '{} {} > {} ({})'.format(r[0],dfM['Open'].iloc[0], r[1], r[2])
 
                     from pyrebase import pyrebase
 
