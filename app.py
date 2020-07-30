@@ -132,7 +132,7 @@ def handle_message(event):
             ticket = [text_from_user]
             symbols = list(map(lambda e: e + '.bk', ticket))
 
-            def request(code):
+            def checkstock(code):
 
                 url = 'https://www.settrade.com/C04_02_stock_historical_p1.jsp?txtSymbol={}&ssoPageId=10&selectPage=2'.format(code)
                 webopen = req(url)
@@ -292,8 +292,8 @@ def handle_message(event):
                     support3 = '%.2f'%support3
                     support3 = str(support3)
 
-                    r = request(code)
-                    text_request = '{} {} > {} ({})'.format(r[0],OpenM, r[1], r[2])
+                    r = checkstock(code)
+                    text_request = '{} {} > {} ({})'.format(r[0],dfM['Open'].iloc[0], r[1], r[2])
 
                     from pyrebase import pyrebase
 
