@@ -338,12 +338,11 @@ def handle_message(event):
                     fig, ax = plt.subplots(figsize=(14,7))
 
                     dfY['Close'].plot()
-                    dfY['OpenM'].plot(color="#FFD100")
-                    dfY['OpenQ'].plot(color="#00A22F")
-                    dfY['OpenY'].plot(color="#FF0000")
+                    dfY['OpenQ'].plot(color="#FF0000")
+                    dfY['OpenY'].plot(color="#16CE00")
 
-                    dfY['limitC'].plot(color="#FFD100")
-                    dfY['min_value'].plot(color="#FFD100",linestyle="-.")		
+                    dfY['limitC'].plot(color="#00A6FF",linestyle="-.")
+                    dfY['min_value'].plot(color="#FFC800",linestyle="-.")		
 
                     dfY['ExitQ1'].plot(color="#553E3E",linestyle="-.") 
                     dfY['ExitQ2'].plot(color="#553E3E",linestyle="-.") 
@@ -356,7 +355,7 @@ def handle_message(event):
                     dfY['fibo_Q5'].plot(color="#AEAEAE",linestyle="dotted")
                     dfY['fibo_Q6'].plot(color="#AEAEAE",linestyle="dotted")
                     
-                    for var in (dfY['Close'],dfY['min_value'], dfY['OpenY'], dfY['OpenQ'], dfY['OpenM'],dfY['limitC'], dfY['ExitQ1'], dfY['ExitQ2'], dfY['ExitQ3'], dfY['fibo_Q1'], dfY['fibo_Q2'], dfY['fibo_Q3'], dfY['fibo_Q4'], dfY['fibo_Q5'], dfY['fibo_Q6']):
+                    for var in (dfY['Close'],dfY['min_value'], dfY['OpenY'], dfY['OpenQ'],dfY['limitC'], dfY['ExitQ1'], dfY['ExitQ2'], dfY['ExitQ3'], dfY['fibo_Q1'], dfY['fibo_Q2'], dfY['fibo_Q3'], dfY['fibo_Q4'], dfY['fibo_Q5'], dfY['fibo_Q6']):
                         plt.annotate('%0.2f' % var.iloc[-1], xy=(1, var.iloc[-1]), xytext=(8, 0), 
                                     xycoords=('axes fraction', 'data'), textcoords='offset points')
 
@@ -382,26 +381,20 @@ def handle_message(event):
                     if float(value) > 7500000:
                         if  barY >= 0.00:
                             if barQ >= 0.00:
-                                if barM >= 0.00:
-                                    if 0.00 < barY < 3.00:
-                                        word_to_reply = str(alert1 + text)
-                                    elif 0.00 < barQ < 3.00:
-                                        word_to_reply = str(alert1 + text)
-                                    else:
-                                        word_to_reply = str(alert2 + text)
+                                if 0.00 < barY < 3.00:
+                                    word_to_reply = str(alert1 + text)
+                                elif 0.00 < barQ < 3.00:
+                                    word_to_reply = str(alert1 + text)
                                 else:
-                                    word_to_reply = str(alert3 + text)
+                                    word_to_reply = str(alert2 + text)
                             else:
                                 word_to_reply = str(alert4 + text)
                         else:
                             if barQ >= 0.00:
-                                if barM >= 0.00:
-                                    if 0.00 < barQ < 3.00:
-                                        word_to_reply = str(alert1 + text)
-                                    else:
-                                        word_to_reply = str(alert2 + text)
+                                if 0.00 < barQ < 3.00:
+                                    word_to_reply = str(alert1 + text)
                                 else:
-                                    word_to_reply = str(alert3 + text)
+                                    word_to_reply = str(alert2 + text)
                             else:
                                 word_to_reply = str(alert4 + text)
                     else:
@@ -413,7 +406,7 @@ def handle_message(event):
                             messages=[text_to_reply]
                         )
 
-                    linechat(word_to_reply +'\n' + send_url)
+                    linechat(send_url)
                     
             for symbol in symbols:
                 stock(symbol).ticket()
