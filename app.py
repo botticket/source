@@ -321,7 +321,7 @@ def handle_message(event):
                     dfY['OpenY'] = dfY['Open'].iloc[0]
                     dfY['OpenQ'] = dfQ['Open'].iloc[0]
                     dfY['OpenM'] = dfM['Open'].iloc[0]
-                    dfY['limitC'] = dfY['OpenM'] *1.02
+                    dfY['limitC'] = dfY['OpenY'] *1.02
 
                     dfY['ExitQ1'] = dfY['OpenQ'] *1.20
                     dfY['ExitQ2'] = dfY['OpenQ'] *1.40
@@ -382,8 +382,6 @@ def handle_message(event):
                         if  barY >= 0.00:
                             if barQ >= 0.00:
                                 if 0.00 < barY < 3.00:
-                                    word_to_reply = str(alert1 + text)
-                                elif 0.00 < barQ < 3.00:
                                     word_to_reply = str(alert1 + text)
                                 else:
                                     word_to_reply = str(alert2 + text)
