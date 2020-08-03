@@ -355,8 +355,8 @@ def handle_message(event):
                     dfY['fibo_Q5'].plot(color="#AEAEAE",linestyle="dotted")
                     dfY['fibo_Q6'].plot(color="#AEAEAE",linestyle="dotted")
                     
-                    for var in (dfY['Close'],dfY['min_value'], dfY['OpenY'], dfY['OpenQ'],dfY['limitC'], dfY['ExitQ1'], dfY['ExitQ2'], dfY['ExitQ3'], dfY['fibo_Q1'], dfY['fibo_Q2'], dfY['fibo_Q3'], dfY['fibo_Q4'], dfY['fibo_Q5'], dfY['fibo_Q6']):
-                        plt.annotate('%0.2f' % var.iloc[-1], xy=(1, var.iloc[-1]), xytext=(8, 0), 
+                    for var in (dfY['Close'],dfY['min_value'], dfY['OpenY'], dfY['OpenQ'],dfY['limitC'], dfY['ExitQ1'], dfY['ExitQ2'], dfY['ExitQ3'], dfY['fibo_Q2'], dfY['fibo_Q4'], dfY['fibo_Q6']):
+                        plt.annotate('%0.2f' % var.iloc[-1], xy=(1, var.iloc[-1]), xytext=(6, 0), 
                                     xycoords=('axes fraction', 'data'), textcoords='offset points')
 
                     ax.xaxis.set_major_locator(mdates.MonthLocator())
@@ -375,8 +375,8 @@ def handle_message(event):
                     alert3 = 'Alert : ขายนั่งรอ'
                     alert4 = 'Alert : อย่าเพิ่งเข้า'
                     alert5 = 'Alert : Vol น้อย'
-
-                    text = '\n' + text_request +'\n' + 'B: {} + 2 ช่อง'.format(OpenQ) + '\n' + 'Y: {} | M: {}'.format(OpenY,OpenM) + '\n' + 'H: {} | L: {}'.format(max_valueQ,min_value) + '\n' + 'margin {}'.format(mValue) 
+                    
+                    text = '\n' + text_request + '\n' + '{} > {} ({}%)'.format(OpenY,Close,barY) +'\n' + 'B: {} + 2 ช่อง'.format(OpenQ)  + '\n' + 'H: {} | L: {}'.format(max_valueQ,min_value) + '\n' + 'margin {}'.format(mValue) 
 
                     if float(value) > 7500000:
                         if  barY >= 0.00:
