@@ -8,6 +8,8 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage,FollowEvent,QuickReply,QuickReplyButton,MessageAction
 from line_notify import LineNotify
 from datetime import datetime,date
+import warnings
+warnings.filterwarnings("ignore")
 
 app = Flask(__name__)
 
@@ -317,7 +319,12 @@ def handle_message(event):
                     min_value = min_value['Low'].iloc[0]
                     min_value = '%.2f'%min_value
                     min_value = str(min_value) 
-                    
+
+                    max_value = dfQ.nlargest(1, columns = 'High')
+                    max_value = max_value['High'].iloc[0]
+                    max_value = '%.2f'%max_value
+                    max_value = str(max_value) 
+
                     dfY['OpenY'] = dfY['Open'].iloc[0]
                     dfY['OpenQ'] = dfQ['Open'].iloc[0]
                     dfY['OpenM'] = dfM['Open'].iloc[0]
@@ -334,6 +341,7 @@ def handle_message(event):
                     dfY['fibo_Q5'] = dfY['OpenY'] *0.50
                     dfY['fibo_Q6']  = dfY['OpenY'] *0.40
                     dfY['min_value'] = float(min_value)
+                    dfY['max_value'] = float(max_value)
 
                     fig, ax = plt.subplots(figsize=(14,7))
 
@@ -343,10 +351,11 @@ def handle_message(event):
 
                     dfY['limitC'].plot(color="#00A6FF",linestyle="-.")
                     dfY['min_value'].plot(color="#FFC800",linestyle="-.")		
+                    dfY['max_value'].plot(color="#FFC800",linestyle="-.")		
 
-                    dfY['ExitQ1'].plot(color="#553E3E",linestyle="-.") 
-                    dfY['ExitQ2'].plot(color="#553E3E",linestyle="-.") 
-                    dfY['ExitQ3'].plot(color="#553E3E",linestyle="-.") 
+                    dfY['ExitQ1'].plot(color="#AEAEAE",linestyle="dotted") 
+                    dfY['ExitQ2'].plot(color="#AEAEAE",linestyle="dotted") 
+                    dfY['ExitQ3'].plot(color="#AEAEAE",linestyle="dotted") 
 
                     dfY['fibo_Q1'].plot(color="#AEAEAE",linestyle="dotted")
                     dfY['fibo_Q2'].plot(color="#AEAEAE",linestyle="dotted")
@@ -355,7 +364,7 @@ def handle_message(event):
                     dfY['fibo_Q5'].plot(color="#AEAEAE",linestyle="dotted")
                     dfY['fibo_Q6'].plot(color="#AEAEAE",linestyle="dotted")
                     
-                    for var in (dfY['Close'],dfY['min_value'], dfY['OpenY'], dfY['OpenQ'],dfY['limitC'], dfY['ExitQ1'], dfY['ExitQ2'], dfY['ExitQ3'], dfY['fibo_Q2'], dfY['fibo_Q4'], dfY['fibo_Q6']):
+                    for var in (dfY['Close'],dfY['max_value'],dfY['min_value'], dfY['OpenY'], dfY['OpenQ'],dfY['limitC'], dfY['ExitQ1'], dfY['ExitQ2'], dfY['ExitQ3'], dfY['fibo_Q2'], dfY['fibo_Q4'], dfY['fibo_Q6']):
                         plt.annotate('%0.2f' % var.iloc[-1], xy=(1, var.iloc[-1]), xytext=(6, 0), 
                                     xycoords=('axes fraction', 'data'), textcoords='offset points')
 
