@@ -165,6 +165,9 @@ def handle_message(event):
                 stockupdate = stockupdate[13:]
                 return [title,stockprice,change,pchange,stockupdate]
 
+            r = checkstock(code)
+            text_request = '{} > {} ({})'.format(r[0], r[1], r[2])
+
             class stock:
                 def __init__(self,stock):
                     self.stock = stock
@@ -183,8 +186,7 @@ def handle_message(event):
                     OpenY  = '%.2f'%OpenY
                     OpenY = str(OpenY)
 
-                    r = checkstock(code)
-                    text_request = '{} {} > {} ({})'.format(r[0],OpenY , r[1], r[2])
+
 
                     OpenQ = dfQ['Open'].iloc[0]
                     OpenQ  = '%.2f'%OpenQ
@@ -362,9 +364,8 @@ def handle_message(event):
                     dfY['fibo_Q5'].plot(color="#AEAEAE",linestyle="dotted")
                     dfY['fibo_Q6'].plot(color="#AEAEAE",linestyle="dotted")
                     
-                    for var in (dfY['Close'],dfY['max_value'],dfY['min_value'], dfY['OpenY'], dfY['OpenQ'], dfY['ExitQ1'], dfY['ExitQ2'], dfY['ExitQ3'], dfY['fibo_Q2'], dfY['fibo_Q4'], dfY['fibo_Q6']):
-                        plt.annotate('%0.2f' % var.iloc[-1], xy=(1, var.iloc[-1]), xytext=(6, 0), 
-                                    xycoords=('axes fraction', 'data'), textcoords='offset points')
+                    for var in (dfY['Close'],dfY['max_value'],dfY['min_value'], dfY['OpenY'], dfY['OpenQ'], dfY['ExitQ1'], dfY['ExitQ2'], dfY['ExitQ3'], dfY['fibo_Q1'], dfY['fibo_Q2'], dfY['fibo_Q3'], dfY['fibo_Q4'], dfY['fibo_Q5'], dfY['fibo_Q6']):
+                        plt.annotate('%0.2f' % var.iloc[-1], xy=(1, var.iloc[-1]), xytext=(6, 0),xycoords=('axes fraction', 'data'), textcoords='offset points')
 
                     ax.xaxis.set_major_locator(mdates.MonthLocator())
                     ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
