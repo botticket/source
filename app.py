@@ -21,11 +21,11 @@ channel_access_token = line_access_token
 line_bot_api = LineBotApi(channel_access_token)
 handler = WebhookHandler(channel_secret)
 
-IQXGL = '1780.50'
-IQXBRT = '41.61'
-IQUSTB = '30.89'
-tfex_value = '880.00'
-set_value = '1345.60'
+IQXGL = '1887.55'
+IQXBRT = '41.36'
+IQUSTB = '31.64'
+tfex_value = '778.60'
+set_value = '1237.00'
 #Quarter
 
 today = date.today()
@@ -186,8 +186,6 @@ def handle_message(event):
                     OpenY  = '%.2f'%OpenY
                     OpenY = str(OpenY)
 
-
-
                     OpenQ = dfQ['Open'].iloc[0]
                     OpenQ  = '%.2f'%OpenQ
                     OpenQ = str(OpenQ)
@@ -335,12 +333,12 @@ def handle_message(event):
                     dfY['ExitQ2'] = dfY['OpenQ'] *1.40
                     dfY['ExitQ3'] = dfY['OpenQ'] *1.60
 
-                    dfY['fibo_Q1'] = dfY['OpenY'] *0.90
-                    dfY['fibo_Q2']  = dfY['OpenY'] *0.80
-                    dfY['fibo_Q3']  =dfY['OpenY'] *0.70
-                    dfY['fibo_Q4'] = dfY['OpenY'] *0.60
-                    dfY['fibo_Q5'] = dfY['OpenY'] *0.50
-                    dfY['fibo_Q6']  = dfY['OpenY'] *0.40
+                    dfY['fibo_Q1'] = dfY['OpenQ'] *0.90
+                    dfY['fibo_Q2']  = dfY['OpenQ'] *0.80
+                    dfY['fibo_Q3']  =dfY['OpenQ'] *0.70
+                    dfY['fibo_Q4'] = dfY['OpenQ'] *0.60
+                    dfY['fibo_Q5'] = dfY['OpenQ'] *0.50
+                    dfY['fibo_Q6']  = dfY['OpenQ'] *0.40
                     dfY['min_value'] = float(min_value)
                     dfY['max_value'] = float(max_value)
 
