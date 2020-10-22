@@ -47,7 +47,7 @@ else:
 
 def linechat(text):
     
-    ACCESS_TOKEN = "oK2sk4w1eidfRyOVfgIcln38TBS8JmL0PgfbbQ8t0Zv"
+    ACCESS_TOKEN = "12CiN1mDzj3q93N5aTYvtWX63XlQOqDs6FWizTRUx1y"
     notify = LineNotify(ACCESS_TOKEN)
     notify.send(text)
 
@@ -234,15 +234,15 @@ def handle_message(event):
                     mValue = int(mValue)
                     mValue = "{:,}".format(mValue)
 
-                    exit1 = float(OpenQ) * 1.20
+                    exit1 = float(OpenQ) * 1.15
                     exit1 = '%.2f'%exit1
                     exit1 = str(exit1)
 
-                    exit2 = float(OpenQ) * 1.40
+                    exit2 = float(OpenQ) * 1.30
                     exit2 = '%.2f'%exit2
                     exit2 = str(exit2)
 
-                    exit3 = float(OpenQ) * 1.60
+                    exit3 = float(OpenQ) * 1.45
                     exit3 = '%.2f'%exit3
                     exit3 = str(exit3)
 
@@ -313,57 +313,72 @@ def handle_message(event):
                     storage = firebase.storage()
                     upload_jpg_firebase = "image/fig.png"	
 
-                    dfQ.dropna(inplace=True)
+                    dfY.dropna(inplace=True)
 
+                    #copy dataframeY
+                    dfY = dfY.copy()
+                    dfY['date_id'] = ((dfY.index.date - dfY.index.date.min())).astype('timedelta64[D]')
+                    dfY['date_id'] = dfY['date_id'].dt.days + 1
+
+                    # high trend lineY
+                    dfY_mod = dfY.copy()
+
+                    while len(dfY_mod)>3:
+
+                        reg = linregress(x=dfY_mod['date_id'],y=dfY_mod['Close'],)
+                        dfY_mod = dfY_mod.loc[dfY_mod['Close'] > reg[0] * dfY_mod['date_id'] + reg[1]]
+
+                    reg = linregress(x=dfY_mod['date_id'],y=dfY_mod['Close'],)
+                    dfY['high_trend'] = reg[0] * dfY['date_id'] + reg[1]
+
+                    # low trend lineY
+                    dfY_mod = dfY.copy()
+
+                    while len(dfY_mod)>3:
+
+                        reg = linregress(x=dfY_mod['date_id'],y=dfY_mod['Close'],)
+                        dfY_mod = dfY_mod.loc[dfY_mod['Close'] < reg[0] * dfY_mod['date_id'] + reg[1]]
+
+                    reg = linregress(x=dfY_mod['date_id'],y=dfY_mod['Close'],)
+                    dfY['low_trend'] = reg[0] * dfY['date_id'] + reg[1]
+
+                    Ltrend = dfY['low_trend'].iloc[-1]
+                    Ltrend  = '%.2f'%Ltrend
+                    Ltrend = str(Ltrend)
+
+                    # Mid trend lineY
+                    dfY['mid_trend'] = (dfY['high_trend'] + dfY['low_trend'])/2
+                    
                     min_value = dfY.nsmallest(1, columns = 'Low')
                     min_value = min_value['Low'].iloc[0]
                     min_value = '%.2f'%min_value
                     min_value = str(min_value) 
 
-                    max_value = dfQ.nlargest(1, columns = 'High')
-                    max_value = max_value['High'].iloc[0]
-                    max_value = '%.2f'%max_value
-                    max_value = str(max_value) 
-
                     dfY['OpenY'] = dfY['Open'].iloc[0]
                     dfY['OpenQ'] = dfQ['Open'].iloc[0]
                     dfY['OpenM'] = dfM['Open'].iloc[0]
 
-                    dfY['ExitQ1'] = dfY['OpenQ'] *1.20
-                    dfY['ExitQ2'] = dfY['OpenQ'] *1.40
-                    dfY['ExitQ3'] = dfY['OpenQ'] *1.60
-
-                    dfY['fibo_Q1'] = dfY['OpenQ'] *0.90
-                    dfY['fibo_Q2']  = dfY['OpenQ'] *0.80
-                    dfY['fibo_Q3']  =dfY['OpenQ'] *0.70
-                    dfY['fibo_Q4'] = dfY['OpenQ'] *0.60
-                    dfY['fibo_Q5'] = dfY['OpenQ'] *0.50
-                    dfY['fibo_Q6']  = dfY['OpenQ'] *0.40
                     dfY['min_value'] = float(min_value)
-                    dfY['max_value'] = float(max_value)
+                    dfY['fibo_plus'] = dfY['OpenY'] *1.10
 
                     fig, ax = plt.subplots(figsize=(8,9))
 
                     dfY['Close'].plot()
-                    dfY['OpenQ'].plot(color="#FF0000")
                     dfY['OpenY'].plot(color="#16CE00")
+                    dfY['OpenQ'].plot(color="#FF0000")
+                    dfY['OpenM'].plot(color="#000000")
+
+                    dfY['high_trend'].plot(color="#FF8600")
+                    dfY['low_trend'].plot(color="#FF00A1")
+                    dfY['mid_trend'].plot(color="#FF0000",linestyle="dotted")
 
                     dfY['min_value'].plot(color="#FFC800",linestyle="-.")		
-                    dfY['max_value'].plot(color="#FFC800",linestyle="-.")		
+			        dfY['fibo_plus'].plot(color="#16CE00",linestyle="dotted")
 
-                    dfY['ExitQ1'].plot(color="#AEAEAE",linestyle="dotted") 
-                    dfY['ExitQ2'].plot(color="#AEAEAE",linestyle="dotted") 
-                    dfY['ExitQ3'].plot(color="#AEAEAE",linestyle="dotted") 
-
-                    dfY['fibo_Q1'].plot(color="#AEAEAE",linestyle="dotted")
-                    dfY['fibo_Q2'].plot(color="#AEAEAE",linestyle="dotted")
-                    dfY['fibo_Q3'].plot(color="#AEAEAE",linestyle="dotted")
-                    dfY['fibo_Q4'].plot(color="#AEAEAE",linestyle="dotted")
-                    dfY['fibo_Q5'].plot(color="#AEAEAE",linestyle="dotted")
-                    dfY['fibo_Q6'].plot(color="#AEAEAE",linestyle="dotted")
-                    
-                    for var in (dfY['Close'],dfY['max_value'],dfY['min_value'], dfY['OpenY'], dfY['OpenQ'], dfY['ExitQ1'], dfY['ExitQ2'], dfY['ExitQ3'], dfY['fibo_Q1'], dfY['fibo_Q2'], dfY['fibo_Q3'], dfY['fibo_Q4'], dfY['fibo_Q5'], dfY['fibo_Q6']):
-                        plt.annotate('%0.2f' % var.iloc[-1], xy=(1, var.iloc[-1]), xytext=(6, 0),xycoords=('axes fraction', 'data'), textcoords='offset points')
+                    for var in (dfY['OpenY'],dfY['OpenQ'],dfY['high_trend'],dfY['mid_trend'],
+                                dfY['high_trendQ'],dfY['low_trendQ'],dfY['min_Y'],dfY['fibo_plus'],):
+                                plt.annotate('%0.2f' % var.iloc[-1], xy=(1, var.iloc[-1]), xytext=(8, 0), 
+                                xycoords=('axes fraction', 'data'), textcoords='offset points')
 
                     ax.xaxis.set_major_locator(mdates.MonthLocator())
                     ax.xaxis.set_major_formatter(mdates.DateFormatter('%b %d'))
