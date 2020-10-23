@@ -230,6 +230,7 @@ def handle_message(event):
                     request_val = str(request_val)
                     
                     dfQ['mValue'] = (dfQ['Close'] - dfQ['Open']) * dfQ['Volume']
+
                     mValue = dfQ['mValue'].iloc[-1]
                     mValue = int(mValue)
                     mValue = "{:,}".format(mValue)
@@ -353,7 +354,7 @@ def handle_message(event):
                     min_value = min_value['Low'].iloc[0]
                     min_value = '%.2f'%min_value
                     min_value = str(min_value) 
-
+                    
                     dfY['OpenY'] = dfY['Open'].iloc[0]
                     dfY['OpenQ'] = dfQ['Open'].iloc[0]
                     dfY['OpenM'] = dfM['Open'].iloc[0]
@@ -392,32 +393,25 @@ def handle_message(event):
                     send_url = 'https://firebasestorage.googleapis.com/v0/b/worldstock-iardyn.appspot.com/o/image%2Ffig.png?alt=media&token=e794bf2f-9208-4656-b15b-36095ff0877c'
 
                     alert1 = 'Alert : ซื้อ'
-                    alert2 = 'Alert : ไปต่อ'
-                    alert3 = 'Alert : ขายนั่งรอ'
-                    alert4 = 'Alert : อย่าเพิ่งเข้า'
-                    alert5 = 'Alert : Vol น้อย'
-                    
-                    text = '\n' + text_request + '\n' + '{} > {} ({}%)'.format(OpenY,Close,barY) +'\n' + 'B: {} + 2 ช่อง'.format(OpenQ)  + '\n' + 'H: {} | L: {}'.format(max_valueQ,min_value) + '\n' + 'margin {}'.format(mValue) 
+                    alert2 = 'Alert : ย่อ'
+                    alert3 = 'Alert : ลงต่อ'
 
-                    if float(value) > 7500000:
+                    
+                    text = '\n' + text_request + '\n' + '{} > {} ({}%)'.format(OpenY,Close,barY) +'\n' + 'B: {}'.format(OpenM)  + '\n' + 'H: {} | L: {}'.format(max_valueQ,min_value) + '\n' + 'margin {}'.format(mValue) 
+
+                    if float(value) > 1000000:
                         if  barY >= 0.00:
-                            if barQ >= 0.00:
-                                if 0.00 < barY < 3.00:
-                                    word_to_reply = str(alert1 + text)
-                                else:
-                                    word_to_reply = str(alert2 + text)
+                            if barM >= 0.00:
+                                word_to_reply = str(alert1 + text)
                             else:
-                                word_to_reply = str(alert4 + text)
+                                word_to_reply = str(alert2 + text)
                         else:
-                            if barQ >= 0.00:
-                                if 0.00 < barQ < 3.00:
-                                    word_to_reply = str(alert1 + text)
-                                else:
-                                    word_to_reply = str(alert2 + text)
+                            if barM >= 0.00:
+                                word_to_reply = str(alert1 + text)
                             else:
-                                word_to_reply = str(alert4 + text)
+                                word_to_reply = str(alert3 + text)
                     else:
-                        word_to_reply = str(alert5 + text)
+                        word_to_reply = str(alert3 + text)
                     
                     text_to_reply = TextSendMessage(text = word_to_reply)
                     line_bot_api.reply_message(
