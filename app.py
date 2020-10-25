@@ -395,11 +395,10 @@ def handle_message(event):
                     alert1 = 'Alert : ซื้อ'
                     alert2 = 'Alert : ย่อ'
                     alert3 = 'Alert : ลงต่อ'
-
                     
                     text = '\n' + text_request + '\n' + '{} > {} ({}%)'.format(OpenY,Close,barY) +'\n' + 'B: {}'.format(OpenM)  + '\n' + 'H: {} | L: {}'.format(max_valueQ,min_value) + '\n' + 'margin {}'.format(mValue) 
 
-                    if float(value) > 1000000:
+                    if float(value) >= 1000000:
                         if  barY >= 0.00:
                             if barM >= 0.00:
                                 word_to_reply = str(alert1 + text)
