@@ -52,30 +52,30 @@ def linechat(text):
     notify.send(text)
 
 def sendimage(filename):
-	file = {'imageFile':open(filename,'rb')}
-	payload = {'message': 'update'}
-	return _lineNotify(payload,file)
+    file = {'imageFile':open(filename,'rb')}
+    payload = {'message': 'update'}
+    return _lineNotify(payload,file)
 
 def _lineNotify(payload,file=None):
-	import requests
-	url = 'https://notify-api.line.me/api/notify'
-	token = 'fzU5NggivM0rgd8sDfJjdAP3kMCzU0JzmvbPJGLxZMZ'	#EDIT
-	headers = {'Authorization':'Bearer '+token}
-	return requests.post(url, headers=headers , data = payload, files=file)
+    import requests
+    url = 'https://notify-api.line.me/api/notify'
+    token = 'fzU5NggivM0rgd8sDfJjdAP3kMCzU0JzmvbPJGLxZMZ'	#EDIT
+    headers = {'Authorization':'Bearer '+token}
+    return requests.post(url, headers=headers , data = payload, files=file)
 
 @app.route("/webhook", methods=['POST'])
 def callback():
-	# get X-Line-Signature header value
-	signature = request.headers['X-Line-Signature']
-	# get request body as text
-	body = request.get_data(as_text=True)
-	app.logger.info("Request body: " + body)
-	# handle webhook body
-	try:
-		handler.handle(body, signature)
-	except InvalidSignatureError:
-		abort(400)
-	return 'OK'
+    # get X-Line-Signature header value
+    signature = request.headers['X-Line-Signature']
+    # get request body as text
+    body = request.get_data(as_text=True)
+    app.logger.info("Request body: " + body)
+    # handle webhook body
+    try:
+        handler.handle(body, signature)
+    except InvalidSignatureError:
+        abort(400)
+    return 'OK'
 
 
 @handler.add(MessageEvent, message=TextMessage)
@@ -373,8 +373,8 @@ def handle_message(event):
                     dfY['low_trend'].plot(color="#FF00A1")
                     dfY['mid_trend'].plot(color="#FF0000",linestyle="dotted")
 
-                    dfY['min_value'].plot(color="#FFC800",linestyle="-.")		
-			        dfY['fibo_plus'].plot(color="#16CE00",linestyle="dotted")
+                    dfY['min_value'].plot(color="#FFC800",linestyle="-.")
+                    dfY['fibo_plus'].plot(color="#16CE00",linestyle="dotted")
 
                     for var in (dfY['OpenY'],dfY['OpenQ'],dfY['high_trend'],dfY['mid_trend'],
                                 dfY['high_trendQ'],dfY['low_trendQ'],dfY['min_Y'],dfY['fibo_plus'],):
@@ -425,7 +425,7 @@ def handle_message(event):
     except:
         text_list = [
             '{} ไม่มีในฐานข้อมูล {} ลองใหม่อีกครั้ง'.format(text_from_user,disname),
-            '{} ค้นหาหุ้น {} ไม่ถูกต้อง ลองใหม่อีกครั้ง'.format(disname, text_from_user),
+            '{} พิมพ์ชื่อหุ้น {} ไม่ถูกต้อง ลองใหม่อีกครั้ง'.format(disname, text_from_user),
         ]
 
         from random import choice
