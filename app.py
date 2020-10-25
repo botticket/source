@@ -121,13 +121,20 @@ def handle_message(event):
             return 'OK'
         else:
                             
+            import math
+            import warnings
+            import numpy as np
+            import pandas as pd 
+            import matplotlib.pyplot as plt
+            warnings.filterwarnings("ignore")
             from pandas_datareader import data 
             from datetime import datetime,date
             from bs4 import BeautifulSoup as soup 
             from urllib.request import urlopen as req
-            import pandas as pd 
-            import numpy as np
-            import matplotlib.pyplot as plt
+            from urllib.request import Request,urlopen
+            from openpyxl import Workbook, load_workbook
+            from line_notify import LineNotify
+            from scipy.stats import linregress
             import matplotlib.dates as mdates
 
             code = text_from_user
