@@ -294,7 +294,7 @@ def handle_message(event):
                     pmin_value = str(pmin_value)
 
                     alert1 = 'Alert : หุ้นวิ่งเมื่อเลย {}'.format(OpenM)
-                    alert2 = 'Alert : หุ้นกำลังย่อ'
+                    alert2 = 'Alert : หุ้นกำลังย่อ รอ {}'.format(OpenM)
                     alert3 = 'Alert : หุ้นลงต่อเมื่อหลุด {}'.format(OpenM)
                     
                     text = '\n' + text_request + '\n' + 'แนวต้าน {} | แนวรับ {}'.format(max_valueQ,min_value)
