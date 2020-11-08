@@ -173,7 +173,7 @@ def handle_message(event):
                 return [title,stockprice,change,pchange,stockupdate]
 
             r = checkstock(code)
-            text_request = '{} > {} ({})'.format(r[0], r[1], r[2])
+            text_request = 'ตอนนี้ {} ราคา {} ({})'.format(r[0], r[1], r[2])
 
             class stock:
                 def __init__(self,stock):
@@ -240,7 +240,7 @@ def handle_message(event):
 
                     mValue = dfQ['mValue'].iloc[-1]
                     mValue = int(mValue)
-                    mValue = "{:,}".format(mValue)
+                    #mValue = "{:,}".format(mValue)
 
                     exit1 = float(OpenQ) * 1.15
                     exit1 = '%.2f'%exit1
@@ -293,45 +293,27 @@ def handle_message(event):
                     pmin_value = '%.2f'%pmin_value
                     pmin_value = str(pmin_value)
 
-                    support1 = float(OpenY) * 0.80
-                    support1 = '%.2f'%support1
-                    support1 = str(support1)
-
-                    support2 = float(OpenY) * 0.70
-                    support2 = '%.2f'%support2
-                    support2 = str(support2)
-
-                    support3 = float(OpenY) * 0.60
-                    support3 = '%.2f'%support3
-                    support3 = str(support3)
-
-                    alert1 = 'Alert : ซื้อ'
-                    alert2 = 'Alert : ย่อ'
-                    alert3 = 'Alert : ลงต่อ'
+                    alert1 = 'Alert : หุ้นวิ่งเมื่อเลย {}'.format(OpenM)
+                    alert2 = 'Alert : หุ้นกำลังย่อ'
+                    alert3 = 'Alert : หุ้นลงต่อเมื่อหลุด {}'.format(OpenM)
                     
-                    text = '\n' + text_request + '\n' + '{} > {} ({}%)'.format(OpenY,Close,barY) +'\n' + 'B: {}'.format(OpenM)  + '\n' + 'H: {} | L: {}'.format(max_valueQ,min_value) + '\n' + 'margin {}'.format(mValue) 
+                    text = '\n' + text_request + '\n' + 'แนวต้าน {} | แนวรับ {}'.format(max_valueQ,min_value)
 
-                    if float(value) >= 1000000:
-                        if  barY >= 0.00:
-                            if barM >= 0.00:
-                                word_to_reply = str(alert1 + text)
-                            else:
-                                word_to_reply = str(alert2 + text)
+                    if barM > 0.00:
+                        if float(mValue) > 0:
+                            word_to_reply = str(alert1 + text)
                         else:
-                            if barM >= 0.00:
-                                word_to_reply = str(alert1 + text)
-                            else:
-                                word_to_reply = str(alert3 + text)
+                            word_to_reply = str(alert2 + text)
                     else:
                         word_to_reply = str(alert3 + text)
-                    
+
                     text_to_reply = TextSendMessage(text = word_to_reply)
                     line_bot_api.reply_message(
                             event.reply_token,
                             messages=[text_to_reply]
                         )
 
-                    linechat(send_url)
+                    linechat(word_to_reply)
                     
             for symbol in symbols:
                 stock(symbol).ticket()
@@ -356,9 +338,6 @@ def RegisRichmenu(event):
     userid = event.source.user_id
     disname = line_bot_api.get_profile(user_id=userid).display_name
     line_bot_api.link_rich_menu_to_user(userid,'richmenu-073dc85eff8bb8351e8d53769c025029')
-
-    button_1 = QuickReplyButton(action=MessageAction(lable='สวัสดี',text='สวัสดี'))
-    answer_button = QuickReply(items=[button_1])
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 2000))
