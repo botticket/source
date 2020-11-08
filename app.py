@@ -284,7 +284,7 @@ def handle_message(event):
                     pmax_valueQ = '%.2f'%pmax_valueQ
                     pmax_valueQ = str(pmax_valueQ)  
 
-                    min_value = dfY.nsmallest(1, columns = 'Low')
+                    min_value = dfQ.nsmallest(1, columns = 'Low')
                     min_value = min_value['Low'].iloc[0]
                     min_value = '%.2f'%min_value
                     min_value = str(min_value) 
