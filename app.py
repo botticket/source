@@ -141,36 +141,24 @@ def handle_message(event):
             ticket = [text_from_user]
             symbols = list(map(lambda e: e + '.bk', ticket))
 
-            def checkstock(code):
-
-                url = 'https://www.settrade.com/C04_02_stock_historical_p1.jsp?txtSymbol={}&ssoPageId=10&selectPage=2'.format(code)
+            def checkmarket(code):
+                url = 'https://www.settrade.com/C04_01_stock_quote_p1.jsp?txtSymbol={}&ssoPageId=9&selectPage=1'.format(code)
                 webopen = req(url)
                 page_html = webopen.read()
                 webopen.close()
 
                 data = soup(page_html, 'html.parser')
                 price = data.findAll('div',{'class':'col-xs-6'})
-
                 title = price[0].text
                 stockprice = price[2].text
-
+                stockprice = stockprice.replace('\n','')
                 change = price[3].text
                 change = change.replace('\n','')
                 change = change.replace('\r','')
-                change = change.replace('\t','')
-                change = change.replace(' ','')
-                change = change[11:]
-
-                pchange = price[4].text
-                pchange = pchange.replace('\n','')
-                pchange = pchange.replace('\r','')
-                pchange = pchange.replace(' ','')
-                pchange = pchange[12:]
-
-                update = data.findAll('span',{'class':'stt-remark'})
-                stockupdate = update[0].text
-                stockupdate = stockupdate[13:]
-                return [title,stockprice,change,pchange,stockupdate]
+                change = change[87:]	
+                pbv = data.findAll('div',{'class':'text-right col-xs-4'})
+                pbv_rate = pbv[4].text
+                return [title,stockprice,change,pbv_rate]
 
             r = checkstock(code)
             text_request = 'ตอนนี้ {} ราคา {} ({})'.format(r[0], r[1], r[2])
@@ -197,25 +185,17 @@ def handle_message(event):
                     OpenQ  = '%.2f'%OpenQ
                     OpenQ = str(OpenQ)
 
-                    p_openQ = ((float(OpenQ) - float(OpenY)) / float(OpenY))*100
-                    p_openQ  = '%.2f'%p_openQ
-                    p_openQ = str(p_openQ)
-
                     OpenM = dfM['Open'].iloc[0]
                     OpenM  = '%.2f'%OpenM
                     OpenM = str(OpenM)
 
-                    Close = float(f'{r[1]}')
+                    try:
+                        Close = float(st[1])
+                    except ValueError:
+                        Close = dfY['Close'].iloc[-1]
+
                     Close  = '%.2f'%Close
-                    Close = str(Close)
-
-                    barY = ((float(Close) - float(OpenY)) / float(OpenY) )*100
-                    barY = '%.2f'%barY
-                    barY = float(barY)
-
-                    barQ = ((float(Close) - float(OpenQ)) / float(OpenQ) )*100
-                    barQ = '%.2f'%barQ
-                    barQ = float(barQ)
+                    Close = str(Close) 
 
                     barM = ((float(Close) - float(OpenM)) / float(OpenM) )*100
                     barM = '%.2f'%barM
@@ -240,21 +220,20 @@ def handle_message(event):
 
                     mValue = dfQ['mValue'].iloc[-1]
                     mValue = int(mValue)
-                    #mValue = "{:,}".format(mValue)
 
-                    exit1 = float(OpenQ) * 1.15
+                    exit1 = float(OpenM) * 1.15
                     exit1 = '%.2f'%exit1
                     exit1 = str(exit1)
 
-                    exit2 = float(OpenQ) * 1.30
+                    exit2 = float(OpenM) * 1.30
                     exit2 = '%.2f'%exit2
                     exit2 = str(exit2)
 
-                    exit3 = float(OpenQ) * 1.45
+                    exit3 = float(OpenM) * 1.45
                     exit3 = '%.2f'%exit3
                     exit3 = str(exit3)
 
-                    buyQ = float(OpenQ) * 1.02
+                    buyQ = float(OpenM) * 1.02
                     buyQ = '%.2f'%buyQ
                     buyQ = str(buyQ) 
 
@@ -270,28 +249,15 @@ def handle_message(event):
                     stopY = '%.2f'%stopY
                     stopY = str(stopY) 
 
-                    max_value = dfY.nlargest(1, columns = 'High')
-                    max_value = max_value['High'].iloc[0]
-                    max_value = '%.2f'%max_value
-                    max_value = str(max_value) 
-
                     max_valueQ = dfQ.nlargest(1, columns = 'High')
                     max_valueQ = max_valueQ['High'].iloc[0]
                     max_valueQ = '%.2f'%max_valueQ
                     max_valueQ = str(max_valueQ) 
 
-                    pmax_valueQ = ((float(max_valueQ) - float(OpenQ)) / float(OpenQ)) * 100
-                    pmax_valueQ = '%.2f'%pmax_valueQ
-                    pmax_valueQ = str(pmax_valueQ)  
-
                     min_value = dfQ.nsmallest(1, columns = 'Low')
                     min_value = min_value['Low'].iloc[0]
                     min_value = '%.2f'%min_value
                     min_value = str(min_value) 
-
-                    pmin_value = ((float(min_value) - float(OpenY)) / float(OpenY)) * 100
-                    pmin_value = '%.2f'%pmin_value
-                    pmin_value = str(pmin_value)
 
                     alert1 = 'Alert : หุ้นวิ่งเมื่อเลย {}'.format(OpenM)
                     alert2 = 'Alert : หุ้นกำลังย่อ รอ {}'.format(OpenM)
