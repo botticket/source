@@ -153,8 +153,8 @@ def handle_message(event):
             pbv_rate = pbv[4].text
             return [title,stockprice,change,pbv_rate]
 
-        r = checkmarket(code)
-        text_request = 'ตอนนี้ {} ราคา {} ({})'.format(r[0], r[1], r[2])
+        st = checkmarket(code)
+        text_request = 'ตอนนี้ {} ราคา {} ({})'.format(st[0], st[1], st[2])
 
         class stock:
             def __init__(self,stock):
