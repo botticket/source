@@ -254,9 +254,9 @@ def handle_message(event):
                     min_value = '%.2f'%min_value
                     min_value = str(min_value) 
 
-                    alert1 = 'เลย {} ซื้อติดมือ'.format(OpenM)
-                    alert2 = 'กำลังย่อ / ไม่หลุด {} ห่อกลับ'.format(OpenM)
-                    alert3 = 'หลุด {} ลงต่อ'.format(OpenM)
+                    alert1 = '>> เลย {} ซื้อติดมือ'.format(OpenM)
+                    alert2 = '>> กำลังย่อ / ไม่หลุด {} ห่อกลับ'.format(OpenM)
+                    alert3 = '>> หลุด {} ลงต่อ'.format(OpenM)
                     
                     
                     text = text_request + '\n' + 'แนวต้าน {} | แนวรับ {}'.format(max_valueQ,min_value) + '\n' 
