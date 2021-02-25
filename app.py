@@ -387,7 +387,7 @@ def handle_message(event):
                 else:
                     notice = f'กำลังย่อ/ปรับฐาน ไม่หลุด {CloseM} ห่อกลับ'
 
-                text_return = f'ตอนนี้ {list} \nราคา {Close} ({today_chg}) \n{notice} \nแนวต้าน {max_Y}  \nแนวรับ {min_Y}  \nFree Float {freefloat}%'
+                text_return = f'ตอนนี้ {list} \nราคา {Close} ({today_chg}) \n{notice} \nแนวต้าน {max_Y}  \nแนวรับ {min_Y}'
                 
                 word_to_reply = str(text_return)
                 text_to_reply = TextSendMessage(text = word_to_reply)
