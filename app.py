@@ -124,8 +124,8 @@ def handle_message(event):
             comvluee = format(float(comvlue),',')
             return [title,stockprice,change,comvlue,comvluee]
 
-        r = checkstock(code)
-        text_request = '{} {} ({})'.format(r[0], r[1], r[2])
+        st = checkmarket(code)
+        text_request = '{} {} ({})'.format(st[0], st[1], st[2])
 
         class stock:
             def __init__(self,stock):
