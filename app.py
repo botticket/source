@@ -8,8 +8,6 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage,FollowEvent,QuickReply,QuickReplyButton,MessageAction
 from line_notify import LineNotify
 from datetime import datetime,date
-import warnings
-warnings.filterwarnings("ignore")
 
 app = Flask(__name__)
 
@@ -22,54 +20,43 @@ line_bot_api = LineBotApi(channel_access_token)
 handler = WebhookHandler(channel_secret)
 
 today = date.today()
+
+start_year = today.year - 1
+start_year = '{}-{}-01'.format(start_year,today.month)
+
 yearly = '{}-01-01'.format(today.year)
 monthly = '{}-{}-01'.format(today.year,today.month)
 
-if today.month >= 10 :
-    quarter = '{}-10-01'.format(today.year)
-    tfex_code = 'S50Z20'
-elif today.month >= 7:
-    quarter = '{}-07-01'.format(today.year)
-    tfex_code = 'S50U20'
-elif today.month >= 4 :
-    quarter = '{}-04-01'.format(today.year)
-    tfex_code = 'S50M20'
-else:
-    quarter = '{}-01-01'.format(today.year)
-    tfex_code = 'S50H20'
-
 def linechat(text):
-    
-    ACCESS_TOKEN = "12CiN1mDzj3q93N5aTYvtWX63XlQOqDs6FWizTRUx1y"
+    ACCESS_TOKEN = "oK2sk4w1eidfRyOVfgIcln38TBS8JmL0PgfbbQ8t0Zv"
     notify = LineNotify(ACCESS_TOKEN)
     notify.send(text)
 
 def sendimage(filename):
-    file = {'imageFile':open(filename,'rb')}
-    payload = {'message': 'update'}
-    return _lineNotify(payload,file)
+	file = {'imageFile':open(filename,'rb')}
+	payload = {'message': 'update'}
+	return _lineNotify(payload,file)
 
 def _lineNotify(payload,file=None):
-    import requests
-    url = 'https://notify-api.line.me/api/notify'
-    token = 'fzU5NggivM0rgd8sDfJjdAP3kMCzU0JzmvbPJGLxZMZ'	#EDIT
-    headers = {'Authorization':'Bearer '+token}
-    return requests.post(url, headers=headers , data = payload, files=file)
+	import requests
+	url = 'https://notify-api.line.me/api/notify'
+	token = 'fzU5NggivM0rgd8sDfJjdAP3kMCzU0JzmvbPJGLxZMZ'	#EDIT
+	headers = {'Authorization':'Bearer '+token}
+	return requests.post(url, headers=headers , data = payload, files=file)
 
 @app.route("/webhook", methods=['POST'])
 def callback():
-    # get X-Line-Signature header value
-    signature = request.headers['X-Line-Signature']
-    # get request body as text
-    body = request.get_data(as_text=True)
-    app.logger.info("Request body: " + body)
-    # handle webhook body
-    try:
-        handler.handle(body, signature)
-    except InvalidSignatureError:
-        abort(400)
-    return 'OK'
-
+	# get X-Line-Signature header value
+	signature = request.headers['X-Line-Signature']
+	# get request body as text
+	body = request.get_data(as_text=True)
+	app.logger.info("Request body: " + body)
+	# handle webhook body
+	try:
+		handler.handle(body, signature)
+	except InvalidSignatureError:
+		abort(400)
+	return 'OK'
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
@@ -98,37 +85,16 @@ def handle_message(event):
                     messages=[text_to_reply]
                 )
             return 'OK'
-        elif 'hi' in text_from_user:    
-            text_list = [
-                'Hello {} '.format(disname),
-                'Good day {} '.format(disname),
-            ]
-
-            from random import choice
-            word_to_reply = choice(text_list)
-            text_to_reply = TextSendMessage(text = word_to_reply)
-            line_bot_api.reply_message(
-                    event.reply_token,
-                    messages=[text_to_reply]
-                )
-            return 'OK'
         else:
                             
+            from bs4 import BeautifulSoup as soup
+            from urllib.request import urlopen as req
+            from pandas_datareader import data
+            from datetime import datetime, date
+            from scipy.stats import linregress
             import math
-            import warnings
             import numpy as np
             import pandas as pd 
-            import matplotlib.pyplot as plt
-            warnings.filterwarnings("ignore")
-            from pandas_datareader import data 
-            from datetime import datetime,date
-            from bs4 import BeautifulSoup as soup 
-            from urllib.request import urlopen as req
-            from urllib.request import Request,urlopen
-            from openpyxl import Workbook, load_workbook
-            from line_notify import LineNotify
-            from scipy.stats import linregress
-            import matplotlib.dates as mdates
 
             code = text_from_user
             ticket = [text_from_user]
@@ -149,14 +115,15 @@ def handle_message(event):
                 change = change.replace('\n','')
                 change = change.replace('\r','')
                 change = change[87:]	
-                pbv = data.findAll('div',{'class':'text-right col-xs-4'})
-                pbv_rate = pbv[4].text
-                pbv_rate = pbv_rate.replace('\n','')
-                pbv_rate = pbv_rate.replace(' ','')
-                return [title,stockprice,change,pbv_rate]
+                comvlue = data.findAll('div',{'class':'col-xs-4'})
+                comvlue = comvlue[6].text
+                comvlue = comvlue.replace(',','')
+                comvlue = format(float(comvlue),'')
+                comvluee = format(float(comvlue),',')
+                return [title,stockprice,change,comvlue,comvluee]
 
-            st = checkmarket(code)
-            text_request = 'ตอนนี้ {} : {} ({})'.format(st[0], st[1], st[2])
+            r = checkstock(code)
+            text_request = '{} {} ({})'.format(r[0], r[1], r[2])
 
             class stock:
                 def __init__(self,stock):
@@ -166,135 +133,293 @@ def handle_message(event):
                     end = datetime.now()
                     start = datetime(end.year,end.month,end.day)
                     list = self.stock
+                    
+                    try:
+                        dfY = data.DataReader(f'{list}', data_source="yahoo", start=yearly, end=end)
+                    except ValueError:
+                        dfY = data.DataReader(f'{list}', data_source="yahoo", start=start_year, end=end)
 
-                    dfY = data.DataReader(f'{list}', data_source="yahoo", start=yearly, end=end)
-                    dfQ = data.DataReader(f'{list}', data_source="yahoo", start=quarter, end=end)
-                    dfM = data.DataReader(f'{list}', data_source="yahoo", start=monthly, end=end)
-                    list = list.replace('.bk','')
-                                
+                    try:
+                        dfM = data.DataReader(f'{list}', data_source="yahoo", start=monthly, end=end)
+                    except ValueError:
+                        dfM = data.DataReader(f'{list}', data_source="yahoo", start=start_year, end=end)
+
+                    list = list.replace('.bk','') 
+
+                    stock = f'{list}'
+                    dfall.dropna(inplace=True)
+
+                    try:
+                        Close = float(st[1])
+                    except ValueError:
+                        Close = dfall['Close'].iloc[-1]
+
+                    Close  = '%.2f'%Close
+                    Close = str(Close) 
+
+                    Open_all = dfall['Open'].iloc[0]
+                    Open_all  = '%.2f'%Open_all
+                    Open_all = str(Open_all)
+
+                    Chg_all = ((float(Close) - float(Open_all))/ float(Open_all))*100
+                    Chg_all = '%.2f'%Chg_all
+                    Chg_all = str(Chg_all)
+
                     OpenY = dfY['Open'].iloc[0]
                     OpenY  = '%.2f'%OpenY
                     OpenY = str(OpenY)
 
-                    OpenQ = dfQ['Open'].iloc[0]
-                    OpenQ  = '%.2f'%OpenQ
-                    OpenQ = str(OpenQ)
+                    CloseY = dfY['Close'].iloc[0]
+                    CloseY  = '%.2f'%CloseY
+                    CloseY = str(CloseY)
+
+                    ChgY = ((float(Close) - float(OpenY)) / float(OpenY) )*100
+                    ChgY = '%.2f'%ChgY
+                    ChgY = str(ChgY)
+
+                    Chg_closeY = ((float(Close) - float(CloseY)) / float(CloseY) )*100
+                    Chg_closeY = '%.2f'%Chg_closeY
+                    Chg_closeY = str(Chg_closeY)
 
                     OpenM = dfM['Open'].iloc[0]
                     OpenM  = '%.2f'%OpenM
                     OpenM = str(OpenM)
 
+                    CloseM = dfM['Close'].iloc[0]
+                    CloseM  = '%.2f'%CloseM
+                    CloseM = str(CloseM)
+
+                    ChgM = ((float(Close) - float(CloseM)) / float(CloseM) )*100
+                    ChgM = '%.2f'%ChgM
+                    ChgM = str(ChgM)
+
                     try:
-                        Close = float(st[1])
+                        today_chg = float(st[2])
                     except ValueError:
-                        Close = dfY['Close'].iloc[-1]
+                        today_chg = float(dfall['Close'].iloc[-1]) - float(dfall['Close'].iloc[-2])
 
-                    Close  = '%.2f'%Close
-                    Close = str(Close) 
+                    today_chg  = '%.2f'%today_chg
+                    today_chg = str(today_chg)
 
-                    barM = ((float(Close) - float(OpenM)) / float(OpenM) )*100
-                    barM = '%.2f'%barM
-                    barM = float(barM)
+                    def computeRSI (data, time_window):
+                        diff = data.diff(1).dropna()
+                        up_chg = 0 * diff
+                        down_chg = 0 * diff
 
-                    Volume1 = dfY['Volume'].iloc[-1]
-                    Volume2 = dfY['Volume'].iloc[-2]
+                        up_chg[diff > 0] = diff[ diff>0 ]    
+                        down_chg[diff < 0] = diff[ diff < 0 ]
 
-                    Volume = (float(Volume1)+float(Volume2))/2
-                    Volume  = '%.0f'%Volume
+                        up_chg_avg   = up_chg.ewm(com=time_window-1 , min_periods=time_window).mean()
+                        down_chg_avg = down_chg.ewm(com=time_window-1 , min_periods=time_window).mean()
+
+                        rs = abs(up_chg_avg/down_chg_avg)
+                        rsi = 100 - 100/(1+rs)
+                        return rsi
+
+                    dfall['RSI'] = computeRSI(dfall['Close'], 14)
+                    m_RSI = dfall['RSI'].iloc[-1]
+                    m_RSI = '%.2f'%m_RSI
+                    m_RSI = str(m_RSI)
+
+                    #copy dataframeY
+                    dfall = dfall.copy()
+                    dfall['date_id'] = ((dfall.index.date - dfall.index.date.min())).astype('timedelta64[D]')
+                    dfall['date_id'] = dfall['date_id'].dt.days + 1
+
+                    # high trend lineY
+                    dfall_mod = dfall.copy()
+
+                    while len(dfall_mod)>3:
+
+                        reg = linregress(x=dfall_mod['date_id'],y=dfall_mod['Close'],)
+                        dfall_mod = dfall_mod.loc[dfall_mod['Close'] > reg[0] * dfall_mod['date_id'] + reg[1]]
+
+                    reg = linregress(x=dfall_mod['date_id'],y=dfall_mod['Close'],)
+                    dfall['high_trend'] = reg[0] * dfall['date_id'] + reg[1]
+
+                    # low trend lineY
+                    dfall_mod = dfall.copy()
+
+                    while len(dfall_mod)>3:
+
+                        reg = linregress(x=dfall_mod['date_id'],y=dfall_mod['Close'],)
+                        dfall_mod = dfall_mod.loc[dfall_mod['Close'] < reg[0] * dfall_mod['date_id'] + reg[1]]
+
+                    reg = linregress(x=dfall_mod['date_id'],y=dfall_mod['Close'],)
+                    dfall['low_trend'] = reg[0] * dfall['date_id'] + reg[1]
+
+                    min_Y = dfall.nsmallest(1, columns='Low')
+                    min_Y = min_Y['Low'].iloc[-1]
+                    min_Y = '%.2f'%min_Y
+                    min_Y = str(min_Y)
+
+                    max_Y = dfall.nlargest(1, columns='High')
+                    max_Y = max_Y['High'].iloc[-1]
+                    max_Y = '%.2f'%max_Y
+                    max_Y = str(max_Y)
+
+                    dfall['min_Y'] = float(min_Y)
+                    dfall['max_Y'] = float(max_Y)
+
+                    #copy dataframe prevQ
+                    dfY = dfY.copy()
+                    dfY['date_id'] = ((dfY.index.date - dfY.index.date.min())).astype('timedelta64[D]')
+                    dfY['date_id'] = dfY['date_id'].dt.days + 1
+
+                    # high trend line prevQ
+                    dfY_mod = dfY.copy()
+
+                    while len(dfY_mod)>3:
+
+                        reg = linregress(x=dfY_mod['date_id'],y=dfY_mod['High'],)
+                        dfY_mod = dfY_mod.loc[dfY_mod['High'] > reg[0] * dfY_mod['date_id'] + reg[1]]
+
+                    reg = linregress(x=dfY_mod['date_id'],y=dfY_mod['High'],)
+                    dfY['high_trendQ'] = reg[0] * dfY['date_id'] + reg[1]
+
+                    # low trend line prevQ
+                    dfY_mod = dfY.copy()
+
+                    while len(dfY_mod)>3:
+
+                        reg = linregress(x=dfY_mod['date_id'],y=dfY_mod['Low'],)
+                        dfY_mod = dfY_mod.loc[dfY_mod['Low'] < reg[0] * dfY_mod['date_id'] + reg[1]]
+
+                    reg = linregress(x=dfY_mod['date_id'],y=dfY_mod['Low'],)
+                    dfY['low_trendQ'] = reg[0] * dfY['date_id'] + reg[1]
+                    dfY['low_trendQ'] = dfY['low_trendQ'].replace(np.nan, dfY['Close'].iloc[0])
+
+                    candle_start = dfY['low_trendQ'].iloc[0]
+                    candle_start = '%.2f'%candle_start
+                    candle_start = str(candle_start)
+
+                    candle_end = dfY['low_trendQ'].iloc[-1]
+                    candle_end = '%.2f'%candle_end
+                    candle_end = str(candle_end)
+
+                    if float(candle_start) > float(candle_end):
+                        pattern = 'Lower low'
+                    else:
+                        pattern = 'Lower high'
+
+                    Volume = dfY['Volume'].iloc[-1]
                     Volume = str(Volume)
 
-                    value = float(Volume) * float(Close)
-                    value  = '%.2f'%value
-                    value = str(value)
+                    trade_val = float(Close) * float(Volume)
+                    trade_val = int(float(trade_val))
+                    trade_value = '{:,}'.format(trade_val)
 
-                    request_val = float(value) 
-                    request_val  = '{:,.0f}'.format(request_val)
-                    request_val = str(request_val)
-                    
-                    dfQ['mValue'] = (dfQ['Close'] - dfQ['Open']) * dfQ['Volume']
+                    dfall['Open_all'] = dfall['Open'].iloc[0]
+                    dfall['high_trendQ'] = dfY['high_trendQ']
+                    dfall['low_trendQ'] = dfY['low_trendQ']
+                    dfall['ema'] = dfall['Close'].rolling(35).mean()
 
-                    mValue = dfQ['mValue'].iloc[-1]
-                    mValue = int(mValue)
+                    dfY['OpenY'] = dfY['Open'].iloc[0]
+                    dfY['CloseY'] = dfY['Close'].iloc[0]
+                    dfM['CloseM'] = dfM['Close'].iloc[0]
 
-                    exit1 = float(OpenM) * 1.15
-                    exit1 = '%.2f'%exit1
-                    exit1 = str(exit1)
+                    ema = dfall['ema'].iloc[-1]
+                    ema = '%.2f'%ema
+                    ema = str(ema)
 
-                    exit2 = float(OpenM) * 1.30
-                    exit2 = '%.2f'%exit2
-                    exit2 = str(exit2)
+                    pema = ((float(Close) - float(ema)) / float(ema))*100
+                    pema = '%.2f'%pema
+                    pema = str(pema)
 
-                    exit3 = float(OpenM) * 1.45
-                    exit3 = '%.2f'%exit3
-                    exit3 = str(exit3)
+                    high_trend = dfall['high_trend'].iloc[-1]
+                    high_trend = '%.2f'%high_trend
+                    high_trend = str(high_trend)
 
-                    buyQ = float(OpenM) * 1.02
-                    buyQ = '%.2f'%buyQ
-                    buyQ = str(buyQ) 
+                    high_trendQ = dfall['high_trendQ'].iloc[-1]
+                    high_trendQ = '%.2f'%high_trendQ
+                    high_trendQ = str(high_trendQ)
 
-                    stopQ = float(OpenQ) * 0.98
-                    stopQ = '%.2f'%stopQ
-                    stopQ = str(stopQ) 
+                    comvlue = float(st[3])
+                    comvluee = str(st[4])
 
-                    buyY = float(OpenY) * 1.02
-                    buyY = '%.2f'%buyY
-                    buyY = str(buyY) 
-
-                    stopY = float(OpenY) * 0.98
-                    stopY = '%.2f'%stopY
-                    stopY = str(stopY) 
-
-                    max_valueQ = dfQ.nlargest(1, columns = 'High')
-                    max_valueQ = max_valueQ['High'].iloc[0]
-                    max_valueQ = '%.2f'%max_valueQ
-                    max_valueQ = str(max_valueQ) 
-
-                    min_value = dfQ.nsmallest(1, columns = 'Low')
-                    min_value = min_value['Low'].iloc[0]
-                    min_value = '%.2f'%min_value
-                    min_value = str(min_value) 
-
-                    alert1 = '>> เลย {} ซื้อติดมือ'.format(OpenM)
-                    alert2 = '>> กำลังย่อ / ไม่หลุด {} ห่อกลับ'.format(OpenM)
-                    alert3 = '>> หลุด {} ลงต่อ'.format(OpenM)
-                    
-                    
-                    text = text_request + '\n' + 'แนวต้าน {} | แนวรับ {}'.format(max_valueQ,min_value) + '\n' 
-
-                    if float(mValue) > 0.00:
-                        if  barM > 0:
-                            word_to_reply = str( text + alert1 )
-                        else:
-                            word_to_reply = str( text + alert3 )
+                    if float(ChgM) >= 0.0 :
+                        trendM = ' '
                     else:
-                        word_to_reply = str( text + alert2 )
+                        trendM = 'X'
 
+                    if float(ChgY) >= 0 :
+                        trendAll = '▲'
+                        if float(Close) >= float(CloseM) :
+                            if float(Close) >= float(ema):
+                                trendY = '©'
+                            else:
+                                trendY = ' '
+                        else:
+                            trendY = ' '
+                    else:
+                        trendAll = '▼'
+                        if float(Close) >= float(CloseM) :
+                            if float(Close) >= float(ema):
+                                trendY = '℗'
+                            else:
+                                trendY = ' '
+                        else:
+                            trendY = ' '
+
+
+                    if float(today_chg) >= 0:
+                        if float(Close) > float(CloseY):
+                            if float(Close) >= float(CloseM) :
+                                if float(Close) >= float(ema):
+                                    notice = f'หุ้นขาใหญ่เก็บ {CloseM}'
+                                else:
+                                    notice = f'หุ้นขาใหญ่ขาย {ema}'
+                            else:
+                                notice = f'หุ้นขาใหญ่ปล่อยไหล {CloseM}'
+                        elif float(Close) >= float(CloseM) :
+                            if float(Close) >= float(ema):
+                                notice = f'หุ้นกลับตัวมีแรงซื้อ {CloseM}'
+                            else:
+                                notice = f'หุ้นไหลเมื่อหลุด {ema}'
+                        elif float(Close) >= float(ema):
+                            notice = f'หุ้นกลับตัวระยะสั้น เมื่อผ่าน {ema}'
+                        else:
+                            notice = f'หุ้นไม่มีใครเก็บ {ema}'
+                    else:
+                        notice = f'กำลังย่อ/ปรับฐาน ไม่หลุด {CloseM} ห่อกลับ'
+
+                    text_return = f'ตอนนี้ {list} \nราคา {Close} ({today_chg}) \n{notice} \nแนวต้าน {max_Y}  \nแนวรับ {min_Y}  \nFree Float {freefloat}%'
+                    
+                    word_to_reply = str(text_return)
                     text_to_reply = TextSendMessage(text = word_to_reply)
                     line_bot_api.reply_message(
                             event.reply_token,
-                            messages=[text_to_reply])
-                    linechat(word_to_reply)
+                            messages=[text_to_reply]
+                        )
+
+                    linechat(send_url)
                     
             for symbol in symbols:
                 stock(symbol).ticket()
     except:
         text_list = [
             '{} ไม่มีในฐานข้อมูล {} ลองใหม่อีกครั้ง'.format(text_from_user,disname),
-            '{} พิมพ์ชื่อหุ้น {} ไม่ถูกต้อง ลองใหม่อีกครั้ง'.format(disname, text_from_user)]
+            '{} ค้นหาหุ้น {} ไม่ถูกต้อง ลองใหม่อีกครั้ง'.format(disname, text_from_user),
+        ]
 
         from random import choice
-        word_to_reply = choice(text_list)        
+        word_to_reply = choice(text_list)
+        
         text_to_reply = TextSendMessage(text = word_to_reply)
 
         line_bot_api.reply_message(
                 event.reply_token,
-                messages=[text_to_reply])
+                messages=[text_to_reply]
+            )
 
 @handler.add(FollowEvent)
 def RegisRichmenu(event):
     userid = event.source.user_id
     disname = line_bot_api.get_profile(user_id=userid).display_name
     line_bot_api.link_rich_menu_to_user(userid,'richmenu-073dc85eff8bb8351e8d53769c025029')
+
+    button_1 = QuickReplyButton(action=MessageAction(lable='สวัสดี',text='สวัสดี'))
+    answer_button = QuickReply(items=[button_1])
 
 if __name__ == '__main__':
     port = int(os.getenv('PORT', 2000))
