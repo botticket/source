@@ -136,6 +136,8 @@ def handle_message(event):
                 start = datetime(end.year,end.month,end.day)
                 list = self.stock
                 
+                dfall = data.DataReader(f'{list}', data_source="yahoo",start=start_year, end=end)
+                
                 try:
                     dfY = data.DataReader(f'{list}', data_source="yahoo", start=yearly, end=end)
                 except ValueError:
