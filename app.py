@@ -30,7 +30,7 @@ yearly = '{}-01-01'.format(today.year)
 monthly = '{}-{}-01'.format(today.year,today.month)
 
 def linechat(text):
-    ACCESS_TOKEN = "oK2sk4w1eidfRyOVfgIcln38TBS8JmL0PgfbbQ8t0Zv"
+    ACCESS_TOKEN = "12CiN1mDzj3q93N5aTYvtWX63XlQOqDs6FWizTRUx1y"
     notify = LineNotify(ACCESS_TOKEN)
     notify.send(text)
 
@@ -67,7 +67,7 @@ def handle_message(event):
 
     userid = event.source.user_id
     disname = line_bot_api.get_profile(user_id=userid).display_name
-    request_text= (' bullbot' + '\n' + '>> {} : {}').format(disname,text_from_user)
+    request_text= ('ticket02' + '\n' + '>> {} : {}').format(disname,text_from_user)
     
     print(request_text)
     linechat(request_text)
@@ -395,7 +395,7 @@ def handle_message(event):
                             messages=[text_to_reply]
                         )
 
-                    linechat(send_url)
+                    linechat(word_to_reply)
                     
             for symbol in symbols:
                 stock(symbol).ticket()
