@@ -371,20 +371,20 @@ def handle_message(event):
                                 if float(Close) >= float(ema):
                                     notice = f'หุ้นขาใหญ่เก็บ {CloseM}'
                                 else:
-                                    notice = f'หุ้นขาใหญ่ขาย {ema}'
+                                    notice = f'หุ้นหลุดเทรน {ema}'
                             else:
-                                notice = f'หุ้นขาใหญ่ปล่อย {CloseM}'
+                                notice = f'หุ้นขาใหญ่เท {CloseM}'
                         elif float(Close) >= float(CloseM) :
                             if float(Close) >= float(ema):
                                 notice = f'หุ้นกลับตัวมีแรงซื้อ {CloseM}'
                             else:
-                                notice = f'หุ้นไหลเมื่อหลุด {ema}'
+                                notice = f'หุ้นหลุดค่าเฉลี่ย {ema}'
                         elif float(Close) >= float(ema):
                             notice = f'หุ้นกลับตัวระยะสั้น เมื่อผ่าน {ema}'
                         else:
-                            notice = f'หุ้นไม่มีใครเก็บ {ema}'
+                            notice = f'หุ้นเม่ายังขาย {ema}'
                     else:
-                        notice = f'กำลังย่อ/ปรับฐาน \nไม่หลุด {CloseM} ห่อกลับ'
+                        notice = f'กำลังย่อ/ปรับฐาน \nไม่หลุด {ema} ห่อกลับ'
                     stocknrequest = st[0]
                     text_return = f'ตอนนี้ {stocknrequest} \nราคา {Close} ({today_chg}) \n{notice} \n>> แนวต้าน {max_Y}  \n>> แนวรับ {min_Y}'
                     
