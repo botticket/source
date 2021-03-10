@@ -74,21 +74,15 @@ def handle_message(event):
 
     try:    
         if 'สวัสดี' in text_from_user:    
-            text_list = [
-                'สวัสดีจ้า คุณ {} '.format(disname),
-                'สวัสดีจ้า คุณ {} วันนี้จะเล่นตัวไหนดี'.format(disname),
-            ]
-
+            text_list = ['สวัสดีจ้า คุณ {} '.format(disname),
+                        'สวัสดีจ้า คุณ {} วันนี้จะเล่นตัวไหนดี'.format(disname)]
             from random import choice
             word_to_reply = choice(text_list)
             text_to_reply = TextSendMessage(text = word_to_reply)
-            line_bot_api.reply_message(
-                    event.reply_token,
-                    messages=[text_to_reply]
-                )
+            line_bot_api.reply_message(event.reply_token,messages=[text_to_reply])
             return 'OK'
+
         else:
-                            
             from bs4 import BeautifulSoup as soup
             from urllib.request import urlopen as req
             from pandas_datareader import data
@@ -173,27 +167,15 @@ def handle_message(event):
                     OpenY  = '%.2f'%OpenY
                     OpenY = str(OpenY)
 
-                    CloseY = dfY['Close'].iloc[0]
-                    CloseY  = '%.2f'%CloseY
-                    CloseY = str(CloseY)
-
                     ChgY = ((float(Close) - float(OpenY)) / float(OpenY) )*100
                     ChgY = '%.2f'%ChgY
                     ChgY = str(ChgY)
-
-                    Chg_closeY = ((float(Close) - float(CloseY)) / float(CloseY) )*100
-                    Chg_closeY = '%.2f'%Chg_closeY
-                    Chg_closeY = str(Chg_closeY)
 
                     OpenM = dfM['Open'].iloc[0]
                     OpenM  = '%.2f'%OpenM
                     OpenM = str(OpenM)
 
-                    CloseM = dfM['Close'].iloc[0]
-                    CloseM  = '%.2f'%CloseM
-                    CloseM = str(CloseM)
-
-                    ChgM = ((float(Close) - float(CloseM)) / float(CloseM) )*100
+                    ChgM = ((float(Close) - float(OpenM)) / float(OpenM) )*100
                     ChgM = '%.2f'%ChgM
                     ChgM = str(ChgM)
 
@@ -209,18 +191,15 @@ def handle_message(event):
                         diff = data.diff(1).dropna()
                         up_chg = 0 * diff
                         down_chg = 0 * diff
-
                         up_chg[diff > 0] = diff[ diff>0 ]    
                         down_chg[diff < 0] = diff[ diff < 0 ]
-
                         up_chg_avg   = up_chg.ewm(com=time_window-1 , min_periods=time_window).mean()
                         down_chg_avg = down_chg.ewm(com=time_window-1 , min_periods=time_window).mean()
-
                         rs = abs(up_chg_avg/down_chg_avg)
                         rsi = 100 - 100/(1+rs)
                         return rsi
 
-                    dfall['RSI'] = computeRSI(dfall['Close'], 14)
+                    dfall['RSI'] = computeRSI(dfall['Close'], 35)
                     m_RSI = dfall['RSI'].iloc[-1]
                     m_RSI = '%.2f'%m_RSI
                     m_RSI = str(m_RSI)
@@ -232,23 +211,17 @@ def handle_message(event):
 
                     # high trend lineY
                     dfall_mod = dfall.copy()
-
                     while len(dfall_mod)>3:
-
                         reg = linregress(x=dfall_mod['date_id'],y=dfall_mod['Close'],)
                         dfall_mod = dfall_mod.loc[dfall_mod['Close'] > reg[0] * dfall_mod['date_id'] + reg[1]]
-
                     reg = linregress(x=dfall_mod['date_id'],y=dfall_mod['Close'],)
                     dfall['high_trend'] = reg[0] * dfall['date_id'] + reg[1]
 
                     # low trend lineY
                     dfall_mod = dfall.copy()
-
                     while len(dfall_mod)>3:
-
                         reg = linregress(x=dfall_mod['date_id'],y=dfall_mod['Close'],)
                         dfall_mod = dfall_mod.loc[dfall_mod['Close'] < reg[0] * dfall_mod['date_id'] + reg[1]]
-
                     reg = linregress(x=dfall_mod['date_id'],y=dfall_mod['Close'],)
                     dfall['low_trend'] = reg[0] * dfall['date_id'] + reg[1]
 
@@ -265,62 +238,9 @@ def handle_message(event):
                     dfall['min_Y'] = float(min_Y)
                     dfall['max_Y'] = float(max_Y)
 
-                    #copy dataframe prevQ
-                    dfY = dfY.copy()
-                    dfY['date_id'] = ((dfY.index.date - dfY.index.date.min())).astype('timedelta64[D]')
-                    dfY['date_id'] = dfY['date_id'].dt.days + 1
-
-                    # high trend line prevQ
-                    dfY_mod = dfY.copy()
-
-                    while len(dfY_mod)>3:
-
-                        reg = linregress(x=dfY_mod['date_id'],y=dfY_mod['High'],)
-                        dfY_mod = dfY_mod.loc[dfY_mod['High'] > reg[0] * dfY_mod['date_id'] + reg[1]]
-
-                    reg = linregress(x=dfY_mod['date_id'],y=dfY_mod['High'],)
-                    dfY['high_trendQ'] = reg[0] * dfY['date_id'] + reg[1]
-
-                    # low trend line prevQ
-                    dfY_mod = dfY.copy()
-
-                    while len(dfY_mod)>3:
-
-                        reg = linregress(x=dfY_mod['date_id'],y=dfY_mod['Low'],)
-                        dfY_mod = dfY_mod.loc[dfY_mod['Low'] < reg[0] * dfY_mod['date_id'] + reg[1]]
-
-                    reg = linregress(x=dfY_mod['date_id'],y=dfY_mod['Low'],)
-                    dfY['low_trendQ'] = reg[0] * dfY['date_id'] + reg[1]
-                    dfY['low_trendQ'] = dfY['low_trendQ'].replace(np.nan, dfY['Close'].iloc[0])
-
-                    candle_start = dfY['low_trendQ'].iloc[0]
-                    candle_start = '%.2f'%candle_start
-                    candle_start = str(candle_start)
-
-                    candle_end = dfY['low_trendQ'].iloc[-1]
-                    candle_end = '%.2f'%candle_end
-                    candle_end = str(candle_end)
-
-                    if float(candle_start) > float(candle_end):
-                        pattern = 'Lower low'
-                    else:
-                        pattern = 'Lower high'
-
-                    Volume = dfY['Volume'].iloc[-1]
-                    Volume = str(Volume)
-
-                    trade_val = float(Close) * float(Volume)
-                    trade_val = int(float(trade_val))
-                    trade_value = '{:,}'.format(trade_val)
-
                     dfall['Open_all'] = dfall['Open'].iloc[0]
-                    dfall['high_trendQ'] = dfY['high_trendQ']
-                    dfall['low_trendQ'] = dfY['low_trendQ']
                     dfall['ema'] = dfall['Close'].rolling(35).mean()
-
                     dfY['OpenY'] = dfY['Open'].iloc[0]
-                    dfY['CloseY'] = dfY['Close'].iloc[0]
-                    dfM['CloseM'] = dfM['Close'].iloc[0]
 
                     ema = dfall['ema'].iloc[-1]
                     ema = '%.2f'%ema
@@ -334,13 +254,6 @@ def handle_message(event):
                     high_trend = '%.2f'%high_trend
                     high_trend = str(high_trend)
 
-                    high_trendQ = dfall['high_trendQ'].iloc[-1]
-                    high_trendQ = '%.2f'%high_trendQ
-                    high_trendQ = str(high_trendQ)
-
-                    comvlue = float(st[3])
-                    comvluee = str(st[4])
-
                     if float(ChgM) >= 0.0 :
                         trendM = ' '
                     else:
@@ -348,7 +261,7 @@ def handle_message(event):
 
                     if float(ChgY) >= 0 :
                         trendAll = '▲'
-                        if float(Close) >= float(CloseM) :
+                        if float(Close) >= float(OpenM) :
                             if float(Close) >= float(ema):
                                 trendY = '©'
                             else:
@@ -357,7 +270,7 @@ def handle_message(event):
                             trendY = ' '
                     else:
                         trendAll = '▼'
-                        if float(Close) >= float(CloseM) :
+                        if float(Close) >= float(OpenM) :
                             if float(Close) >= float(ema):
                                 trendY = '℗'
                             else:
@@ -366,61 +279,49 @@ def handle_message(event):
                             trendY = ' '
 
                     if float(today_chg) >= 0:
-                        if float(Close) > float(CloseY):
-                            if float(Close) >= float(CloseM) :
+                        if float(Close) > float(OpenY):
+                            if float(Close) >= float(OpenM) :
                                 if float(Close) >= float(ema):
-                                    notice = f'หุ้นขาใหญ่เก็บ {CloseM}'
+                                    notice = f'หุ้นเก็บของ {OpenM}'
                                 else:
-                                    notice = f'หุ้นหลุดเทรน {ema}'
+                                    notice = f'หุ้นราคาหลุด {ema}'
                             else:
-                                notice = f'หุ้นขาใหญ่เท {CloseM}'
-                        elif float(Close) >= float(CloseM) :
+                                notice = f'หุ้นมีเท {OpenM}'
+                        elif float(Close) >= float(OpenM) :
                             if float(Close) >= float(ema):
-                                notice = f'หุ้นกลับตัวมีแรงซื้อ {CloseM}'
+                                notice = f'หุ้นมีแรงซื้อ {OpenM}'
                             else:
-                                notice = f'หุ้นหลุดค่าเฉลี่ย {ema}'
+                                notice = f'หุ้นราคาหลุด {ema}'
                         elif float(Close) >= float(ema):
-                            notice = f'หุ้นกลับตัวระยะสั้น เมื่อผ่าน {ema}'
+                            notice = f'หุ้นกลับตัวเมื่อเลยราคา {ema}'
                         else:
-                            notice = f'หุ้นเม่ายังขาย {ema}'
+                            notice = f'หุ้นโดนเท {ema}'
                     else:
                         notice = f'กำลังย่อ/ปรับฐาน \nไม่หลุด {ema} ห่อกลับ'
+                        
                     stocknrequest = st[0]
-                    text_return = f'ตอนนี้ {stocknrequest} \nราคา {Close} ({today_chg}) \n{notice} \n>> แนวต้าน {max_Y}  \n>> แนวรับ {min_Y}'
-                    
+                    text_return = f'ตอนนี้ {stocknrequest} \nราคา {Close} ({today_chg}) \n{notice} \n>> แนวต้าน {max_Y}'
                     word_to_reply = str(text_return)
                     text_to_reply = TextSendMessage(text = word_to_reply)
-                    line_bot_api.reply_message(
-                            event.reply_token,
-                            messages=[text_to_reply]
-                        )
-
+                    line_bot_api.reply_message(event.reply_token,messages=[text_to_reply])
                     linechat(word_to_reply)
-                    
+
             for symbol in symbols:
                 stock(symbol).ticket()
     except:
-        text_list = [
-            '{} ไม่มีในฐานข้อมูล {} ลองใหม่อีกครั้ง'.format(text_from_user,disname),
-            '{} ค้นหาหุ้น {} ไม่ถูกต้อง ลองใหม่อีกครั้ง'.format(disname, text_from_user),
-        ]
+        text_list = ['{} ไม่มีในฐานข้อมูล {} ลองใหม่อีกครั้ง'.format(text_from_user,disname),
+            '{} ค้นหาหุ้น {} ไม่ถูกต้อง ลองใหม่อีกครั้ง'.format(disname, text_from_user)]
 
         from random import choice
         word_to_reply = choice(text_list)
-        
         text_to_reply = TextSendMessage(text = word_to_reply)
-
-        line_bot_api.reply_message(
-                event.reply_token,
-                messages=[text_to_reply]
-            )
+        line_bot_api.reply_message(event.reply_token,messages=[text_to_reply])
 
 @handler.add(FollowEvent)
 def RegisRichmenu(event):
     userid = event.source.user_id
     disname = line_bot_api.get_profile(user_id=userid).display_name
     line_bot_api.link_rich_menu_to_user(userid,'richmenu-073dc85eff8bb8351e8d53769c025029')
-
     button_1 = QuickReplyButton(action=MessageAction(lable='สวัสดี',text='สวัสดี'))
     answer_button = QuickReply(items=[button_1])
 
