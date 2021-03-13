@@ -21,13 +21,32 @@ channel_access_token = line_access_token
 line_bot_api = LineBotApi(channel_access_token)
 handler = WebhookHandler(channel_secret)
 
+
 today = date.today()
+end = datetime.now()
+current_time = end.strftime("%H:%M %p")
+current_hrs = end.strftime("%H")
 
 start_year = today.year - 1
 start_year = '{}-{}-01'.format(start_year,today.month)
 
 yearly = '{}-01-01'.format(today.year)
 monthly = '{}-{}-01'.format(today.year,today.month)
+
+prevmo = today.month -1
+if today.month >= 4:
+    prevm = '{}-{}-01'.format(today.year,prevmo)
+    endvm = '{}-{}-30'.format(today.year,prevmo)
+elif today.month == 3:
+    prevm = '{}-{}-01'.format(today.year,prevmo)
+    endvm = '{}-{}-25'.format(today.year,prevmo)
+elif today.month == 2:
+    prevm = '{}-{}-01'.format(today.year,prevmo)
+    endvm = '{}-{}-30'.format(today.year,prevmo)
+else:
+    prevY = today.year - 1
+    prevm = '{}-12-01'.format(prevY)
+    endvm = '{}-12-30'.format(prevY)
 
 def linechat(text):
     ACCESS_TOKEN = "12CiN1mDzj3q93N5aTYvtWX63XlQOqDs6FWizTRUx1y"
@@ -74,7 +93,7 @@ def handle_message(event):
 
     try:    
         if 'สวัสดี' in text_from_user:    
-            text_list = ['สวัสดีจ้า คุณ {} '.format(disname),
+            text_list = ['สวัสดีจ้า คุณ {} สนใจข้อมูลตัวไหนดี'.format(disname),
                         'สวัสดีจ้า คุณ {} วันนี้จะเล่นตัวไหนดี'.format(disname)]
             from random import choice
             word_to_reply = choice(text_list)
@@ -131,7 +150,7 @@ def handle_message(event):
                     list = self.stock
                     
                     dfall = data.DataReader(f'{list}', data_source="yahoo",start=start_year, end=end)
-                    
+
                     try:
                         dfY = data.DataReader(f'{list}', data_source="yahoo", start=yearly, end=end)
                     except ValueError:
@@ -142,6 +161,11 @@ def handle_message(event):
                     except ValueError:
                         dfM = data.DataReader(f'{list}', data_source="yahoo", start=start_year, end=end)
 
+                    try:
+                        preM = data.DataReader(f'{list}', data_source="yahoo", start=prevm, end=endvm)
+                    except ValueError:
+                        preM = data.DataReader(f'{list}', data_source="yahoo", start=start_year, end=end)
+
                     list = list.replace('.bk','') 
 
                     stock = f'{list}'
@@ -151,132 +175,69 @@ def handle_message(event):
                         Close = float(st[1])
                     except ValueError:
                         Close = dfall['Close'].iloc[-1]
-
                     Close  = '%.2f'%Close
-                    Close = str(Close) 
 
                     Open_all = dfall['Open'].iloc[0]
                     Open_all  = '%.2f'%Open_all
-                    Open_all = str(Open_all)
 
                     Chg_all = ((float(Close) - float(Open_all))/ float(Open_all))*100
                     Chg_all = '%.2f'%Chg_all
-                    Chg_all = str(Chg_all)
 
                     OpenY = dfY['Open'].iloc[0]
                     OpenY  = '%.2f'%OpenY
-                    OpenY = str(OpenY)
 
                     ChgY = ((float(Close) - float(OpenY)) / float(OpenY) )*100
                     ChgY = '%.2f'%ChgY
-                    ChgY = str(ChgY)
 
                     OpenM = dfM['Open'].iloc[0]
                     OpenM  = '%.2f'%OpenM
-                    OpenM = str(OpenM)
 
                     ChgM = ((float(Close) - float(OpenM)) / float(OpenM) )*100
                     ChgM = '%.2f'%ChgM
-                    ChgM = str(ChgM)
 
                     try:
                         today_chg = float(st[2])
                     except ValueError:
                         today_chg = float(dfall['Close'].iloc[-1]) - float(dfall['Close'].iloc[-2])
-
                     today_chg  = '%.2f'%today_chg
-                    today_chg = str(today_chg)
+                    
+                    HpreM = preM.nlargest(1, columns='Close')
+                    HpreM = HpreM['Close'].iloc[-1]
+                    HpreM = '%.2f'%HpreM
 
-                    def computeRSI (data, time_window):
-                        diff = data.diff(1).dropna()
-                        up_chg = 0 * diff
-                        down_chg = 0 * diff
-                        up_chg[diff > 0] = diff[ diff>0 ]    
-                        down_chg[diff < 0] = diff[ diff < 0 ]
-                        up_chg_avg   = up_chg.ewm(com=time_window-1 , min_periods=time_window).mean()
-                        down_chg_avg = down_chg.ewm(com=time_window-1 , min_periods=time_window).mean()
-                        rs = abs(up_chg_avg/down_chg_avg)
-                        rsi = 100 - 100/(1+rs)
-                        return rsi
+                    HpreMp = ((float(Close) - float(HpreM))/float(HpreM))*100
+                    HpreMp = '%.2f'%HpreMp
 
-                    dfall['RSI'] = computeRSI(dfall['Close'], 35)
-                    m_RSI = dfall['RSI'].iloc[-1]
-                    m_RSI = '%.2f'%m_RSI
-                    m_RSI = str(m_RSI)
-
-                    #copy dataframeY
-                    dfall = dfall.copy()
-                    dfall['date_id'] = ((dfall.index.date - dfall.index.date.min())).astype('timedelta64[D]')
-                    dfall['date_id'] = dfall['date_id'].dt.days + 1
-
-                    # high trend lineY
-                    dfall_mod = dfall.copy()
-                    while len(dfall_mod)>3:
-                        reg = linregress(x=dfall_mod['date_id'],y=dfall_mod['Close'],)
-                        dfall_mod = dfall_mod.loc[dfall_mod['Close'] > reg[0] * dfall_mod['date_id'] + reg[1]]
-                    reg = linregress(x=dfall_mod['date_id'],y=dfall_mod['Close'],)
-                    dfall['high_trend'] = reg[0] * dfall['date_id'] + reg[1]
-
-                    # low trend lineY
-                    dfall_mod = dfall.copy()
-                    while len(dfall_mod)>3:
-                        reg = linregress(x=dfall_mod['date_id'],y=dfall_mod['Close'],)
-                        dfall_mod = dfall_mod.loc[dfall_mod['Close'] < reg[0] * dfall_mod['date_id'] + reg[1]]
-                    reg = linregress(x=dfall_mod['date_id'],y=dfall_mod['Close'],)
-                    dfall['low_trend'] = reg[0] * dfall['date_id'] + reg[1]
-
-                    min_Y = dfall.nsmallest(1, columns='Low')
-                    min_Y = min_Y['Low'].iloc[-1]
+                    min_Y = dfall.nsmallest(1, columns='Close')
+                    min_Y = min_Y['Close'].iloc[-1]
                     min_Y = '%.2f'%min_Y
-                    min_Y = str(min_Y)
+
+                    min_Yp = ((float(min_Y) - float(Close))/float(Close))*100
+                    min_Yp = '%.2f'%min_Yp
 
                     max_Y = dfall.nlargest(1, columns='High')
                     max_Y = max_Y['High'].iloc[-1]
                     max_Y = '%.2f'%max_Y
-                    max_Y = str(max_Y)
 
-                    dfall['min_Y'] = float(min_Y)
-                    dfall['max_Y'] = float(max_Y)
-
-                    dfall['Open_all'] = dfall['Open'].iloc[0]
-                    dfall['ema'] = dfall['Close'].rolling(35).mean()
-                    dfY['OpenY'] = dfY['Open'].iloc[0]
+                    max_Yp = ((float(max_Y) - float(Close))/float(Close))*100
+                    max_Yp = '%.2f'%max_Yp
 
                     ema = dfall['ema'].iloc[-1]
+                    ema = float(ema)
+                    if ema >= 100:
+                        ema = (round(ema/0.5) * 0.5)
+                    elif ema >= 25:
+                        ema = (round(ema/0.25) * 0.25)
+                    elif ema >= 10:
+                        ema = (round(ema/0.1) * 0.1)
+                    elif ema >= 5:
+                        ema = (round(ema/0.05) * 0.05)
+                    else:
+                        ema = (round(ema/0.02) * 0.02)
                     ema = '%.2f'%ema
-                    ema = str(ema)
 
                     pema = ((float(Close) - float(ema)) / float(ema))*100
                     pema = '%.2f'%pema
-                    pema = str(pema)
-
-                    high_trend = dfall['high_trend'].iloc[-1]
-                    high_trend = '%.2f'%high_trend
-                    high_trend = str(high_trend)
-
-                    if float(ChgM) >= 0.0 :
-                        trendM = ' '
-                    else:
-                        trendM = 'X'
-
-                    if float(ChgY) >= 0 :
-                        trendAll = '▲'
-                        if float(Close) >= float(OpenM) :
-                            if float(Close) >= float(ema):
-                                trendY = '©'
-                            else:
-                                trendY = ' '
-                        else:
-                            trendY = ' '
-                    else:
-                        trendAll = '▼'
-                        if float(Close) >= float(OpenM) :
-                            if float(Close) >= float(ema):
-                                trendY = '℗'
-                            else:
-                                trendY = ' '
-                        else:
-                            trendY = ' '
 
                     if float(today_chg) >= 0:
                         if float(Close) > float(OpenY):
@@ -295,7 +256,7 @@ def handle_message(event):
                         elif float(Close) >= float(ema):
                             notice = f'หุ้นกลับตัวเมื่อเลยราคา {ema}'
                         else:
-                            notice = f'หุ้นโดนเท {ema}'
+                            notice = f'หุ้นหลุด {ema}'
                     else:
                         notice = f'กำลังย่อ/ปรับฐาน \nไม่หลุด {ema} ห่อกลับ'
                         
@@ -304,7 +265,9 @@ def handle_message(event):
                     word_to_reply = str(text_return)
                     text_to_reply = TextSendMessage(text = word_to_reply)
                     line_bot_api.reply_message(event.reply_token,messages=[text_to_reply])
-                    linechat(word_to_reply)
+
+                    text_tobot = f'{list} Y {OpenY} {trendAll} {ChgY}% \ne {ema} ({pema}%) \nH {HpreM} ({HpreMp}%) > {Close} ({today_chg})'
+                    linechat(text_tobot)
 
             for symbol in symbols:
                 stock(symbol).ticket()
