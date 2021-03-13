@@ -221,7 +221,8 @@ def handle_message(event):
 
                 max_Yp = ((float(max_Y) - float(Close))/float(Close))*100
                 max_Yp = '%.2f'%max_Yp
-
+                
+                dfall['ema'] = dfall['Close'].rolling(35).mean()
                 ema = dfall['ema'].iloc[-1]
                 ema = float(ema)
                 if ema >= 100:
