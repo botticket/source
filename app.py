@@ -239,25 +239,15 @@ def handle_message(event):
 
                     pema = ((float(Close) - float(ema)) / float(ema))*100
                     pema = '%.2f'%pema
+                    
+                    OpenD = dfY['Open'].iloc[-1]
+                    OpenD  = '%.2f'%OpenD
 
                     if float(today_chg) >= 0:
-                        if float(Close) > float(OpenY):
-                            if float(Close) >= float(OpenM) :
-                                if float(Close) >= float(ema):
-                                    notice = f'หุ้นเก็บของ {OpenM}'
-                                else:
-                                    notice = f'หุ้นราคาหลุด {ema}'
-                            else:
-                                notice = f'หุ้นมีเท {OpenM}'
-                        elif float(Close) >= float(OpenM) :
-                            if float(Close) >= float(ema):
-                                notice = f'หุ้นมีแรงซื้อ {OpenM}'
-                            else:
-                                notice = f'หุ้นราคาหลุด {ema}'
-                        elif float(Close) >= float(ema):
-                            notice = f'หุ้นกลับตัวเมื่อเลยราคา {ema}'
+                        if float(Close) >= float(ema):
+                            notice = f'หุ้นเก็บของ {ema}'
                         else:
-                            notice = f'หุ้นหลุด {ema}'
+                            notice = f'หุ้นราคาหลุด {ema}'
                     else:
                         notice = f'กำลังย่อ/ปรับฐาน \nไม่หลุด {ema} ห่อกลับ'
                         
@@ -267,7 +257,7 @@ def handle_message(event):
                     text_to_reply = TextSendMessage(text = word_to_reply)
                     line_bot_api.reply_message(event.reply_token,messages=[text_to_reply])
 
-                    text_tobot = f'{list} Y {OpenY} {ChgY}% \ne {ema} ({pema}%) \nH {HpreM} ({HpreMp}%) > {Close} ({today_chg})'
+                    text_tobot = f'{list} Open {OpenD} \nH {HpreM} ({HpreMp}%) > {Close} ({today_chg})'
                     linechat(text_tobot)
 
             for symbol in symbols:
