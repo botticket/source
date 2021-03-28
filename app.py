@@ -167,7 +167,7 @@ def handle_message(event):
                         preM = data.DataReader(f'{list}', data_source="yahoo", start=start_year, end=end)
 
                     list = list.replace('.bk','') 
-
+                    list = list.upper()
                     stock = f'{list}'
                     dfall.dropna(inplace=True)
 
@@ -201,15 +201,29 @@ def handle_message(event):
                         today_chg = float(dfall['Close'].iloc[-1]) - float(dfall['Close'].iloc[-2])
                     today_chg  = '%.2f'%today_chg
                     
-                    HpreM = preM.nlargest(1, columns='Close')
-                    HpreM = HpreM['Close'].iloc[-1]
+                    HpreM = preM.nlargest(1, columns='High')
+                    HpreM = HpreM['High'].iloc[-1]
                     HpreM = '%.2f'%HpreM
 
                     HpreMp = ((float(Close) - float(HpreM))/float(HpreM))*100
                     HpreMp = '%.2f'%HpreMp
+                  
+                    LpreM = dfM.nlargest(1, columns='High')
+                    LpreM = LpreM['Low'].iloc[-1]
+                    if LpreM >= 100:
+                        LpreM = (round(LpreM/0.5) * 0.5)
+                    elif LpreM >= 25:
+                        LpreM = (round(LpreM/0.25) * 0.25)
+                    elif LpreM >= 10:
+                        LpreM = (round(LpreM/0.1) * 0.1)
+                    elif LpreM >= 5:
+                        LpreM = (round(LpreM/0.05) * 0.05)
+                    else:
+                        LpreM = (round(LpreM/0.02) * 0.02)
+                    LpreM = '%.2f'%LpreM
 
-                    min_Y = dfall.nsmallest(1, columns='Close')
-                    min_Y = min_Y['Close'].iloc[-1]
+                    min_Y = dfall.nsmallest(1, columns='Low')
+                    min_Y = min_Y['Low'].iloc[-1]
                     min_Y = '%.2f'%min_Y
 
                     min_Yp = ((float(min_Y) - float(Close))/float(Close))*100
@@ -222,7 +236,7 @@ def handle_message(event):
                     max_Yp = ((float(max_Y) - float(Close))/float(Close))*100
                     max_Yp = '%.2f'%max_Yp
                     
-                    dfall['ema'] = dfall['Close'].rolling(35).mean()
+                    dfall['ema'] = dfall['Close'].rolling(75).mean()
                     ema = dfall['ema'].iloc[-1]
                     ema = float(ema)
                     if ema >= 100:
@@ -251,13 +265,12 @@ def handle_message(event):
                     else:
                         notice = f'กำลังย่อ/ปรับฐาน \nไม่หลุด {ema} ห่อกลับ'
                         
-                    stocknrequest = st[0]
-                    text_return = f'ตอนนี้ {stocknrequest} \nราคา {Close} ({today_chg}) \n{notice} \n>> แนวต้าน {max_Y}'
+                    text_return = f'ตอนนี้ {list} \nราคา {Close} ({today_chg}) \n{notice}'
                     word_to_reply = str(text_return)
                     text_to_reply = TextSendMessage(text = word_to_reply)
                     line_bot_api.reply_message(event.reply_token,messages=[text_to_reply])
 
-                    text_tobot = f'{list} Open {OpenD} \nH {HpreM} ({HpreMp}%) > {Close} ({today_chg})'
+                    text_tobot = f'{list} Open {OpenD} \nH {HpreM} ({HpreMp}%) > {Close} ({today_chg}) \nTpro < {LpreM} \nATH {max_Y}'
                     linechat(text_tobot)
 
             for symbol in symbols:
